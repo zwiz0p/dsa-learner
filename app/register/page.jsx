@@ -18,7 +18,7 @@ export default function RegisterPage() {
 
   const router = useRouter();
 
-  // Preset avatar photos (No upload button for PFPs)
+  // Preset avatar photos
   const presetAvatars = [
     '/avatars/default.png',
     '/avatars/annoyed.jpg',
@@ -50,8 +50,24 @@ export default function RegisterPage() {
     e.preventDefault();
     setError('');
 
-    if (!username.trim() || !email.trim() || !password) {
-      setError('Please fill in all required fields');
+    if (!name.trim()) {
+      setError('Full Name is required');
+      return;
+    }
+    if (!username.trim()) {
+      setError('Username handle is required');
+      return;
+    }
+    if (!email.trim()) {
+      setError('Email is required');
+      return;
+    }
+    if (!password) {
+      setError('Password is required');
+      return;
+    }
+    if (!avatar) {
+      setError('Please select a Profile Photo avatar');
       return;
     }
 
@@ -66,7 +82,7 @@ export default function RegisterPage() {
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, username, email, password, avatar }),
+        body: JSON.stringify({ name: name.trim(), username: username.trim(), email: email.trim(), password, avatar }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -87,7 +103,7 @@ export default function RegisterPage() {
         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
           <span style={{ fontSize: '36px' }}>🌸</span>
           <h2 style={{ fontFamily: 'Fredoka, sans-serif', fontSize: '24px', margin: '8px 0 4px', color: 'var(--text-main)' }}>Create Account</h2>
-          <p style={{ fontSize: '13px', color: 'var(--text-dim)', margin: 0 }}>Join your friends' study lounge & track DSA progress together!</p>
+          <p style={{ fontSize: '13px', color: 'var(--text-dim)', margin: 0 }}>All fields including avatar photo are required!</p>
         </div>
 
         {error && (
@@ -97,9 +113,9 @@ export default function RegisterPage() {
         )}
 
         <form onSubmit={handleRegister}>
-          {/* Full Name Field */}
+          {/* Full Name Field (Required) */}
           <div style={{ marginBottom: '14px' }}>
-            <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '6px' }}>Full Name</label>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '6px' }}>Full Name <span style={{ color: 'var(--accent-pink)' }}>*</span></label>
             <input
               type="text"
               className="input-cute"
@@ -110,9 +126,9 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Unique Username Field with Live Availability Indicator */}
+          {/* Unique Username Field (Required) */}
           <div style={{ marginBottom: '14px' }}>
-            <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '6px' }}>Unique Username Handle</label>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '6px' }}>Unique Username Handle <span style={{ color: 'var(--accent-pink)' }}>*</span></label>
             <input
               type="text"
               className="input-cute"
@@ -128,9 +144,9 @@ export default function RegisterPage() {
             )}
           </div>
 
-          {/* Email Field */}
+          {/* Email Field (Required) */}
           <div style={{ marginBottom: '14px' }}>
-            <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '6px' }}>Email</label>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '6px' }}>Email <span style={{ color: 'var(--accent-pink)' }}>*</span></label>
             <input
               type="email"
               className="input-cute"
@@ -141,9 +157,9 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Password Field with Show/Hide Eye Toggle */}
+          {/* Password Field (Required) */}
           <div style={{ marginBottom: '16px' }}>
-            <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '6px' }}>Password</label>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '6px' }}>Password <span style={{ color: 'var(--accent-pink)' }}>*</span></label>
             <div style={{ position: 'relative' }}>
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -168,9 +184,9 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          {/* Preset Photo Avatars Grid (No file upload for PFPs) */}
+          {/* Preset Photo Avatars Grid (Required) */}
           <div style={{ marginBottom: '20px' }}>
-            <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '6px' }}>Choose Profile Photo (PFP)</label>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '6px' }}>Select Profile Photo (PFP) <span style={{ color: 'var(--accent-pink)' }}>*</span></label>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
               {presetAvatars.map((imgUrl) => (
                 <img
