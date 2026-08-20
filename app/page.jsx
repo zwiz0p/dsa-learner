@@ -817,50 +817,64 @@ export default function DashboardPage() {
 
       </div>
 
-      {/* FLOATING MUSIC PLAYER WINDOW (Interactive Web Logins for Spotify & YouTube) */}
-      <div className={`music-floating-player ${isPlayerExpanded ? 'expanded' : ''}`}>
-        <div className="player-top-row">
-          <div className={`vinyl-disc ${isPlaying ? 'playing' : ''}`}>
-            <div className="vinyl-center-dot"></div>
+      {/* FLOATING MUSIC PLAYER WINDOW (Visible only when logged in) */}
+      {user && (
+        <div className={`music-floating-player ${isPlayerExpanded ? 'expanded' : ''}`}>
+          <div className="player-top-row">
+            <div className={`vinyl-disc ${isPlaying ? 'playing' : ''}`}>
+              <div className="vinyl-center-dot"></div>
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontFamily: 'Fredoka, sans-serif', fontSize: '13.5px', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Music Lounge — Spotify & YouTube</div>
+              <div style={{ fontSize: '11px', color: 'var(--text-dim)' }}>Connect to personal YouTube / Spotify</div>
+            </div>
+            <button className="btn-icon-play" onClick={() => setIsPlaying(!isPlaying)} title={isPlaying ? "Pause" : "Play"}>
+              {isPlaying ? '❚❚' : '▶'}
+            </button>
+            <button className="btn-icon-play" style={{ background: 'var(--badge-bg)', color: 'var(--text-main)', fontSize: '11px' }} onClick={() => setIsPlayerExpanded(!isPlayerExpanded)} title="Expand/Minimize Player">
+              {isPlayerExpanded ? '▼ Minimize' : '▲ Enlarge'}
+            </button>
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontFamily: 'Fredoka, sans-serif', fontSize: '13.5px', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Music Player — Spotify & YouTube</div>
-            <div style={{ fontSize: '11px', color: 'var(--text-dim)' }}>Log in directly to play your personal tracks</div>
-          </div>
-          <button className="btn-icon-play" onClick={() => setIsPlaying(!isPlaying)}>
-            {isPlaying ? '❚❚' : '▶'}
-          </button>
-          <button className="btn-icon-play" style={{ background: 'var(--badge-bg)', color: 'var(--text-main)', fontSize: '11px' }} onClick={() => setIsPlayerExpanded(!isPlayerExpanded)}>⚙️</button>
+
+          {isPlayerExpanded && (
+            <div className="player-expand-panel">
+              <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
+                <button style={{ flex: 1, border: 'none', background: musicSource === 'youtube' ? 'var(--accent-pink)' : 'rgba(0,0,0,0.05)', color: musicSource === 'youtube' ? '#fff' : 'var(--text-dim)', padding: '6px', borderRadius: '12px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }} onClick={() => setMusicSource('youtube')}>📺 YouTube</button>
+                <button style={{ flex: 1, border: 'none', background: musicSource === 'spotify' ? 'var(--accent-pink)' : 'rgba(0,0,0,0.05)', color: musicSource === 'spotify' ? '#fff' : 'var(--text-dim)', padding: '6px', borderRadius: '12px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }} onClick={() => setMusicSource('spotify')}>🎵 Spotify</button>
+              </div>
+
+              {musicSource === 'youtube' ? (
+                <div>
+                  <select className="select-cute" style={{ fontSize: '11.5px', padding: '6px 10px', marginBottom: '8px' }} value={ytStreamId} onChange={(e) => setYtStreamId(e.target.value)}>
+                    <option value="jfKfPfyJRdk">🎧 Lofi Girl - Beats to Relax/Study</option>
+                    <option value="5qap5aO4i9A">🌸 Anime Lofi Chill Beats</option>
+                    <option value="MVPTG06GI8c">🌃 Japanese City Pop & Synth</option>
+                    <option value="7NOSDKb0HlU">☕ Chillhop Cafe Radio</option>
+                  </select>
+                </div>
+              ) : (
+                <div>
+                  <input type="text" className="input-cute" style={{ fontSize: '11.5px', padding: '6px 10px', marginBottom: '8px' }} value={spotifyUrl} onChange={(e) => setSpotifyUrl(e.target.value)} placeholder="Paste Spotify embed URL or track link..." />
+                </div>
+              )}
+
+              {isPlaying ? (
+                <div style={{ width: '100%', height: '180px', borderRadius: '16px', overflow: 'hidden' }}>
+                  <iframe
+                    src={musicSource === 'youtube' ? `https://www.youtube.com/embed/${ytStreamId}?autoplay=1&mute=0` : spotifyUrl}
+                    style={{ width: '100%', height: '100%', border: 0 }}
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  />
+                </div>
+              ) : (
+                <div style={{ textAlign: 'center', padding: '20px', background: 'rgba(0,0,0,0.03)', borderRadius: '16px', fontSize: '12px', color: 'var(--text-dim)' }}>
+                  Click <strong>▶ Play</strong> to launch mini web player frame & sign in!
+                </div>
+              )}
+            </div>
+          )}
         </div>
-
-        {isPlayerExpanded && (
-          <div className="player-expand-panel">
-            <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
-              <button style={{ flex: 1, border: 'none', background: musicSource === 'youtube' ? 'var(--accent-pink)' : 'rgba(0,0,0,0.05)', color: musicSource === 'youtube' ? '#fff' : 'var(--text-dim)', padding: '5px', borderRadius: '12px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }} onClick={() => setMusicSource('youtube')}>YouTube</button>
-              <button style={{ flex: 1, border: 'none', background: musicSource === 'spotify' ? 'var(--accent-pink)' : 'rgba(0,0,0,0.05)', color: musicSource === 'spotify' ? '#fff' : 'var(--text-dim)', padding: '5px', borderRadius: '12px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }} onClick={() => setMusicSource('spotify')}>Spotify</button>
-            </div>
-
-            {musicSource === 'youtube' ? (
-              <select className="select-cute" style={{ fontSize: '11.5px', padding: '6px 10px', marginBottom: '8px' }} value={ytStreamId} onChange={(e) => setYtStreamId(e.target.value)}>
-                <option value="jfKfPfyJRdk">🎧 Lofi Girl - Beats to Relax/Study</option>
-                <option value="5qap5aO4i9A">🌸 Anime Lofi Chill Beats</option>
-                <option value="MVPTG06GI8c">🌃 Japanese City Pop & Synth</option>
-                <option value="7NOSDKb0HlU">☕ Chillhop Cafe Radio</option>
-              </select>
-            ) : (
-              <input type="text" className="input-cute" style={{ fontSize: '11.5px', padding: '6px 10px', marginBottom: '8px' }} value={spotifyUrl} onChange={(e) => setSpotifyUrl(e.target.value)} placeholder="Paste Spotify embed URL or track URI..." />
-            )}
-
-            <div style={{ width: '100%', height: '160px', borderRadius: '16px', overflow: 'hidden' }}>
-              <iframe
-                src={musicSource === 'youtube' ? `https://www.youtube.com/embed/${ytStreamId}?autoplay=1&mute=0` : spotifyUrl}
-                style={{ width: '100%', height: '100%', border: 0 }}
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-              />
-            </div>
-          </div>
-        )}
-      </div>
+      )}
 
       {/* MODAL: ADD CUSTOM PROBLEM */}
       {showAddModal && (

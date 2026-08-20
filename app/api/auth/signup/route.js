@@ -6,23 +6,36 @@ export async function POST(req) {
   try {
     const { username, email, password, avatar, mascotGif } = await req.json();
 
-    if (!username || !email || !password) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    const cleanUsername = username?.trim();
+    const cleanEmail = email?.trim()?.toLowerCase();
+
+    if (!cleanUsername || !cleanEmail || !password) {
+      return NextResponse.json({ error: 'Please fill in all required fields' }, { status: 400 });
     }
 
-    const existing = await db.user.findFirst({
-      where: { OR: [{ username }, { email }] },
+    // Check if username is taken
+    const existingUser = await db.user.findFirst({
+      where: { username: cleanUsername },
     });
 
-    if (existing) {
-      return NextResponse.json({ error: 'Username or email already exists' }, { status: 400 });
+    if (existingUser) {
+      return NextResponse.json({ error: `Username "${cleanUsername}" is already taken` }, { status: 400 });
+    }
+
+    // Check if email is registered
+    const existingEmail = await db.user.findFirst({
+      where: { email: cleanEmail },
+    });
+
+    if (existingEmail) {
+      return NextResponse.json({ error: `Email "${cleanEmail}" is already registered` }, { status: 400 });
     }
 
     const passwordHash = await hashPassword(password);
     const user = await db.user.create({
       data: {
-        username,
-        email,
+        username: cleanUsername,
+        email: cleanEmail,
         passwordHash,
         avatar: avatar || '/avatars/default.png',
         mascotGif: mascotGif || '/mascots/default.gif',
@@ -55,6 +68,6 @@ export async function POST(req) {
     return response;
   } catch (error) {
     console.error('Signup error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 }
