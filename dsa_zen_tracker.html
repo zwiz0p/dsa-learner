@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="day">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌸 Sakura Code — Anime DSA Journey & Friend Study Lounge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Shippori+Mincho:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<style>
+  :root {
+    --transition-speed: 0.35s;
+
+    /* DAY THEME (Pastel Anime Pink & Cream - Matching Mockup) */
+    &[data-theme="day"] {
+      --bg-base: #fef0f5;
+      --bg-gradient: radial-gradient(1200px 800px at 85% -10%, #ffe4ec 0%, #fff5f8 50%, #fce4ec 100%);
+      --card-bg: rgba(255, 255, 255, 0.72);
+      --card-bg-solid: #ffffff;
+      --card-hover: rgba(255, 255, 255, 0.92);
+      --glass-border: rgba(255, 183, 197, 0.45);
+      --text-main: #362938;
+      --text-dim: #7d6b85;
+      --text-muted: #a694b0;
+      
+      --accent-pink: #ff6b8b;
+      --accent-pink-soft: #ffb7c5;
+      --accent-pink-deep: #e04868;
+      --accent-gold: #ffb84d;
+      --accent-sage: #6bc496;
+      --accent-purple: #9b72cf;
+      
+      --shadow-sm: 0 4px 14px rgba(255, 183, 197, 0.25);
+      --shadow-md: 0 10px 30px rgba(255, 107, 139, 0.15);
+      --shadow-lg: 0 20px 50px rgba(255, 107, 139, 0.22);
+      --badge-bg: rgba(255, 107, 139, 0.12);
+      --pill-easy-bg: rgba(107, 196, 150, 0.16);
+      --pill-easy-text: #2d8a59;
+      --pill-med-bg: rgba(255, 184, 77, 0.18);
+      --pill-med-text: #c77b00;
+      --pill-hard-bg: rgba(255, 107, 139, 0.18);
+      --pill-hard-text: #e04868;
+    }
+
+    /* NIGHT THEME (Midnight Anime Cyber Violet) */
+    &[data-theme="night"] {
+      --bg-base: #120e1c;
+      --bg-gradient: radial-gradient(1200px 800px at 85% -10%, #261938 0%, #161124 50%, #0d0a14 100%);
+      --card-bg: rgba(28, 22, 43, 0.72);
+      --card-bg-solid: #1e1730;
+      --card-hover: rgba(38, 30, 58, 0.88);
+      --glass-border: rgba(255, 133, 162, 0.22);
+      --text-main: #f7edff;
+      --text-dim: #b8a6cd;
+      --text-muted: #7d6b94;
+      
+      --accent-pink: #ff85a2;
+      --accent-pink-soft: #ffb7c5;
+      --accent-pink-deep: #ff477e;
+      --accent-gold: #ffd166;
+      --accent-sage: #57cc99;
+      --accent-purple: #b5838d;
+      
+      --shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.5);
+      --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.65);
+      --badge-bg: rgba(255, 133, 162, 0.18);
+      --pill-easy-bg: rgba(87, 204, 153, 0.2);
+      --pill-easy-text: #70e0b1;
+      --pill-med-bg: rgba(255, 209, 102, 0.2);
+      --pill-med-text: #ffe082;
+      --pill-hard-bg: rgba(255, 133, 162, 0.22);
+      --pill-hard-text: #ff9ebb;
+    }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; min-height: 100vh; }
+  
+  body {
+    background: var(--bg-base);
+    background-image: var(--bg-gradient);
+    background-attachment: fixed;
+    color: var(--text-main);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    overflow-x: hidden;
+    transition: background var(--transition-speed) ease, color var(--transition-speed) ease;
+  }
+
+  /* Sakura Petals Canvas */
+  #sakura-canvas {
+    position: fixed; inset: 0; width: 100%; height: 100%;
+    z-index: 0; pointer-events: none;
+    opacity: 0.45;
+  }
+
+  .wrap {
+    position: relative; z-index: 2;
+    max-width: 1140px; margin: 0 auto;
+    padding: 24px 20px 180px;
+  }
+
+  /* TOP NAVIGATION BAR */
+  .top-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(16px) saturate(140%);
+    border-radius: 28px;
+    padding: 10px 20px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-sm);
+    flex-wrap: wrap; gap: 12px;
+  }
+
+  .brand-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Fredoka', sans-serif; font-size: 20px; font-weight: 700;
+    color: var(--accent-pink); text-decoration: none;
+  }
+  .brand-logo .sakura-icon { font-size: 24px; animation: spinPetal 12s linear infinite; }
+  @keyframes spinPetal { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  .nav-tabs {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(0,0,0,0.04); padding: 4px; border-radius: 20px;
+  }
+  [data-theme="night"] .nav-tabs { background: rgba(255,255,255,0.05); }
+
+  .nav-btn {
+    border: none; background: transparent; color: var(--text-dim);
+    font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 600;
+    padding: 8px 16px; border-radius: 16px; cursor: pointer;
+    transition: all 0.25s ease; display: flex; align-items: center; gap: 6px;
+  }
+  .nav-btn:hover { color: var(--accent-pink); background: rgba(255,255,255,0.4); }
+  .nav-btn.active {
+    background: var(--accent-pink); color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(255, 107, 139, 0.35);
+  }
+
+  .nav-controls { display: flex; align-items: center; gap: 10px; }
+
+  /* Profile Pill & Switcher */
+  .profile-pill {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--badge-bg); border: 1px solid var(--glass-border);
+    padding: 5px 12px 5px 6px; border-radius: 20px; cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  .profile-pill:hover { transform: translateY(-1px); }
+  .user-avatar-mini {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-pink), var(--accent-gold));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+  .profile-name { font-size: 13px; font-weight: 700; color: var(--text-main); }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-sage); }
+
+  /* Theme Switch Button */
+  .theme-toggle-btn {
+    border: 1px solid var(--glass-border);
+    background: var(--card-bg); color: var(--text-main);
+    width: 38px; height: 38px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 18px; transition: all 0.25s ease;
+  }
+  .theme-toggle-btn:hover { transform: rotate(15deg) scale(1.08); background: var(--card-hover); }
+
+  /* ANIME HERO & MASCOT BANNER (Based on reference image) */
+  .anime-hero-card {
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(18px) saturate(140%);
+    border-radius: 32px;
+    padding: 28px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow-md);
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  @media (max-width: 900px) {
+    .anime-hero-card { grid-template-columns: 1fr; }
+  }
+
+  .hero-left-content { display: flex; flex-direction: column; justify-content: space-between; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600;
+    color: var(--accent-pink); background: var(--badge-bg);
+    padding: 4px 12px; border-radius: 14px; width: fit-content; margin-bottom: 12px;
+  }
+  
+  .hero-title {
+    font-family: 'Fredoka', sans-serif; font-size: clamp(28px, 4vw, 42px);
+    font-weight: 700; line-height: 1.15; color: var(--text-main); margin: 0 0 10px;
+  }
+  .hero-title span.hl { color: var(--accent-pink); }
+  
+  .hero-quote-box {
+    background: rgba(255,255,255,0.45);
+    border-left: 4px solid var(--accent-pink);
+    padding: 12px 16px; border-radius: 12px; margin: 12px 0 20px;
+    font-family: 'Shippori Mincho', serif; font-size: 14.5px; color: var(--text-dim);
+  }
+  [data-theme="night"] .hero-quote-box { background: rgba(0,0,0,0.25); }
+
+  /* Anime Character Mascot Widget (Mockup Style) */
+  .mascot-widget {
+    background: linear-gradient(135deg, rgba(255, 183, 197, 0.3), rgba(255, 255, 255, 0.5));
+    border: 1px solid var(--glass-border);
+    border-radius: 26px; padding: 20px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    position: relative; text-align: center;
+  }
+  [data-theme="night"] .mascot-widget {
+    background: linear-gradient(135deg, rgba(255, 133, 162, 0.15), rgba(30, 24, 48, 0.6));
+  }
+
+  .speech-bubble {
+    position: relative; background: var(--card-bg-solid);
+    border: 1px solid var(--glass-border);
+    padding: 8px 14px; border-radius: 16px; font-size: 12.5px; font-weight: 600;
+    color: var(--accent-pink-deep); margin-bottom: 12px; box-shadow: var(--shadow-sm);
+  }
+  .speech-bubble::after {
+    content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+    border-width: 6px 6px 0; border-style: solid;
+    border-color: var(--card-bg-solid) transparent; display: block; width: 0;
+  }
+
+  .mascot-img-box {
+    width: 140px; height: 140px; border-radius: 50%;
+    background: linear-gradient(135deg, #ffd1dc, #ff9ebb);
+    border: 4px solid #ffffff; box-shadow: var(--shadow-md);
+    overflow: hidden; display: flex; align-items: center; justify-content: center;
+    margin-bottom: 12px; position: relative;
+  }
+  .mascot-img-box img { width: 100%; height: 100%; object-fit: cover; }
+  
+  /* Fallback Anime SVG Art if character.png not uploaded */
+  .mascot-svg-fallback { width: 110px; height: 110px; }
+
+  .mascot-name { font-family: 'Fredoka', sans-serif; font-size: 18px; font-weight: 700; color: var(--text-main); }
+  .mascot-sub { font-size: 11.5px; color: var(--text-dim); margin-top: 2px; }
+
+  .mascot-tags { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-top: 10px; }
+  .mascot-tag { font-size: 10px; font-weight: 700; background: var(--badge-bg); color: var(--accent-pink); padding: 3px 8px; border-radius: 10px; }
+
+  /* DASHBOARD STATS & PROGRESS RING */
+  .stats-grid {
+    display: grid; grid-template-columns: auto 1fr; gap: 24px;
+    align-items: center; margin-bottom: 28px;
+  }
+  @media (max-width: 768px) { .stats-grid { grid-template-columns: 1fr; } }
+
+  .ring-box {
+    background: var(--card-bg); border: 1px solid var(--glass-border);
+    backdrop-filter: blur(14px); border-radius: 28px; padding: 22px;
+    display: flex; align-items: center; gap: 20px; box-shadow: var(--shadow-sm);
+  }
+
+  .ring-svg-wrap { position: relative; width: 128px; height: 128px; flex: none; }
+  .ring-svg-wrap svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+  .ring-bg { fill: none; stroke: rgba(0, 0, 0, 0.07); stroke-width: 10; }
+  [data-theme="night"] .ring-bg { stroke: rgba(255, 255, 255, 0.08); }
+  .ring-fg {
+    fill: none; stroke: url(#pinkGrad); stroke-width: 10; stroke-linecap: round;
+    transition: stroke-dashoffset 0.7s cubic-bezier(.4,0,.2,1);
+  }
+  .ring-center-text {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+  }
+  .ring-pct { font-family: 'Fredoka', sans-serif; font-size: 26px; font-weight: 700; color: var(--text-main); }
+  .ring-lbl { font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .ring-stats-detail { display: flex; flex-direction: column; gap: 8px; }
+  .ring-stat-row { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text-main); }
+  .ring-stat-icon { font-size: 16px; }
+
+  .cards-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 14px; }
+  .stat-card-cute {
+    background: var(--card-bg); border: 1px solid var(--glass-border);
+    backdrop-filter: blur(14px); border-radius: 22px; padding: 16px 14px;
+    text-align: center; box-shadow: var(--shadow-sm); transition: transform 0.2s ease;
+  }
+  .stat-card-cute:hover { transform: translateY(-3px); }
+  .stat-card-num { font-family: 'Fredoka', sans-serif; font-size: 22px; font-weight: 700; color: var(--accent-pink); }
+  .stat-card-lbl { font-size: 11.5px; font-weight: 600; color: var(--text-dim); margin-top: 2px; }
+
+  /* DIFFICULTY BARS */
+  .diff-section {
+    background: var(--card-bg); border: 1px solid var(--glass-border);
+    backdrop-filter: blur(14px); border-radius: 24px; padding: 18px 24px;
+    margin-bottom: 28px; box-shadow: var(--shadow-sm);
+  }
+  .diff-bars-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 600px) { .diff-bars-grid { grid-template-columns: 1fr; } }
+
+  .diff-col { display: flex; flex-direction: column; gap: 6px; }
+  .diff-hdr { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 700; color: var(--text-main); }
+  .diff-track-bg { height: 8px; border-radius: 10px; background: rgba(0,0,0,0.06); overflow: hidden; }
+  [data-theme="night"] .diff-track-bg { background: rgba(255,255,255,0.08); }
+  .diff-fill-bar { height: 100%; border-radius: 10px; transition: width 0.6s ease; }
+  .diff-fill-bar.easy { background: linear-gradient(90deg, #57cc99, #80ed99); }
+  .diff-fill-bar.medium { background: linear-gradient(90deg, #ffb84d, #ffd166); }
+  .diff-fill-bar.hard { background: linear-gradient(90deg, #ff6b8b, #ff85a2); }
+
+  /* MILESTONE BANNER */
+  .milestone-banner {
+    background: linear-gradient(135deg, rgba(255, 184, 77, 0.2), rgba(255, 107, 139, 0.2));
+    border: 1px solid var(--accent-gold); border-radius: 24px;
+    padding: 16px 24px; margin-bottom: 28px; text-align: center;
+    box-shadow: var(--shadow-sm); animation: popIn 0.5s ease;
+  }
+  @keyframes popIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+  .milestone-tag { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent-pink); text-transform: uppercase; letter-spacing: 0.1em; }
+  .milestone-title { font-family: 'Fredoka', sans-serif; font-size: 22px; font-weight: 700; color: var(--text-main); margin: 4px 0; }
+  .milestone-desc { font-size: 13px; color: var(--text-dim); }
+
+  /* TOPICS HEADER & ADD PROBLEM BAR */
+  .topics-action-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px; flex-wrap: wrap; gap: 12px;
+  }
+  .section-title { font-family: 'Fredoka', sans-serif; font-size: 22px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+  
+  .btn-cute-primary {
+    background: linear-gradient(135deg, var(--accent-pink), var(--accent-pink-deep));
+    color: #ffffff; border: none; padding: 10px 18px; border-radius: 18px;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 700;
+    cursor: pointer; box-shadow: 0 4px 14px rgba(255, 107, 139, 0.4);
+    display: flex; align-items: center; gap: 6px; transition: all 0.25s ease;
+  }
+  .btn-cute-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(255, 107, 139, 0.5); }
+
+  /* TOPICS LIST & ACCORDIONS */
+  .topics-list { display: flex; flex-direction: column; gap: 14px; }
+  .topic-card {
+    background: var(--card-bg); border: 1px solid var(--glass-border);
+    backdrop-filter: blur(16px); border-radius: 24px; overflow: hidden;
+    box-shadow: var(--shadow-sm); transition: border-color 0.3s ease;
+  }
+  .topic-card.open { border-color: var(--accent-pink-soft); }
+
+  .topic-header {
+    display: flex; align-items: center; gap: 16px; padding: 16px 22px;
+    cursor: pointer; user-select: none; transition: background 0.2s ease;
+  }
+  .topic-header:hover { background: var(--card-hover); }
+
+  .topic-badge-num {
+    width: 36px; height: 36px; border-radius: 12px;
+    background: var(--badge-bg); color: var(--accent-pink);
+    font-family: 'Fredoka', sans-serif; font-size: 16px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex: none;
+  }
+
+  .topic-info-box { flex: 1; min-width: 0; }
+  .topic-name { font-family: 'Fredoka', sans-serif; font-size: 17px; font-weight: 700; color: var(--text-main); }
+  .topic-sub-meta { font-size: 12px; font-weight: 600; color: var(--text-dim); margin-top: 2px; }
+
+  .topic-progress-track { width: 110px; height: 6px; border-radius: 10px; background: rgba(0,0,0,0.06); overflow: hidden; flex: none; }
+  [data-theme="night"] .topic-progress-track { background: rgba(255,255,255,0.08); }
+  .topic-progress-fill { height: 100%; border-radius: 10px; background: linear-gradient(90deg, var(--accent-pink), var(--accent-gold)); transition: width 0.5s ease; }
+
+  .chev-icon { width: 18px; height: 18px; flex: none; transition: transform 0.3s ease; opacity: 0.6; fill: none; stroke: var(--text-main); stroke-width: 2.5; }
+  .topic-card.open .chev-icon { transform: rotate(180deg); }
+
+  .topic-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+  .topic-card.open .topic-body { max-height: 3000px; }
+
+  .q-rows-container { padding: 4px 14px 18px; display: flex; flex-direction: column; gap: 6px; }
+
+  .q-row-item {
+    display: grid; grid-template-columns: 28px 1fr auto auto auto; gap: 12px; align-items: center;
+    padding: 10px 14px; border-radius: 14px; transition: background 0.2s ease;
+  }
+  .q-row-item:hover { background: rgba(255,255,255,0.4); }
+  [data-theme="night"] .q-row-item:hover { background: rgba(255,255,255,0.04); }
+  .q-row-item.done .q-title-link { color: var(--text-dim); text-decoration: line-through; }
+
+  .chk-custom {
+    width: 22px; height: 22px; border-radius: 8px; border: 2px solid var(--glass-border);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    background: transparent; transition: all 0.2s ease;
+  }
+  .chk-custom.checked { background: linear-gradient(135deg, var(--accent-pink), var(--accent-gold)); border-color: transparent; }
+  .chk-custom svg { display: none; width: 14px; height: 14px; stroke: #ffffff; stroke-width: 3; }
+  .chk-custom.checked svg { display: block; }
+
+  .q-title-link { font-size: 14px; font-weight: 600; color: var(--text-main); text-decoration: none; }
+  .q-title-link:hover { color: var(--accent-pink); }
+  
+  .added-by-tag {
+    font-size: 10px; font-weight: 700; color: var(--accent-purple);
+    background: rgba(155, 114, 207, 0.14); padding: 2px 7px; border-radius: 8px;
+    margin-left: 6px; display: inline-block;
+  }
+
+  .pill-diff {
+    font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700;
+    padding: 4px 10px; border-radius: 12px; white-space: nowrap; flex: none;
+  }
+  .pill-diff.easy { background: var(--pill-easy-bg); color: var(--pill-easy-text); }
+  .pill-diff.medium { background: var(--pill-med-bg); color: var(--pill-med-text); }
+  .pill-diff.hard { background: var(--pill-hard-bg); color: var(--pill-hard-text); }
+
+  .rev-check-group { display: flex; gap: 6px; flex: none; }
+  .rev-box {
+    width: 18px; height: 18px; border-radius: 6px; border: 1.5px solid var(--glass-border);
+    cursor: pointer; background: transparent; transition: all 0.2s ease;
+  }
+  .rev-box.checked { background: var(--accent-sage); border-color: var(--accent-sage); }
+
+  /* FRIEND TRACKER & STUDY ROOM DRAWER */
+  .friend-sidebar-card {
+    background: var(--card-bg); border: 1px solid var(--glass-border);
+    backdrop-filter: blur(16px); border-radius: 28px; padding: 20px;
+    margin-top: 28px; box-shadow: var(--shadow-sm);
+  }
+
+  .friends-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 14px; }
+  
+  .friend-user-card {
+    background: rgba(255,255,255,0.45); border: 1px solid var(--glass-border);
+    border-radius: 18px; padding: 12px 16px; display: flex; align-items: center; gap: 12px;
+  }
+  [data-theme="night"] .friend-user-card { background: rgba(0,0,0,0.25); }
+
+  .friend-avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-pink), var(--accent-gold));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; color: #fff; font-size: 15px; flex: none; position: relative;
+  }
+  .friend-online-dot {
+    position: absolute; bottom: 0; right: 0; width: 10px; height: 10px;
+    border-radius: 50%; border: 2px solid #fff; background: var(--accent-sage);
+  }
+
+  .friend-info { flex: 1; min-width: 0; }
+  .friend-name-row { font-size: 13.5px; font-weight: 700; color: var(--text-main); display: flex; justify-content: space-between; }
+  .friend-status-text { font-size: 11px; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px; }
+
+  /* STUDY ROOM & CHAT TAB */
+  .study-room-box {
+    display: none; background: var(--card-bg); border: 1px solid var(--glass-border);
+    backdrop-filter: blur(16px); border-radius: 28px; padding: 24px;
+    box-shadow: var(--shadow-sm); margin-bottom: 28px;
+  }
+  .study-room-box.active { display: block; animation: popIn 0.3s ease; }
+
+  .chat-messages-container {
+    height: 260px; overflow-y: auto; padding: 12px;
+    background: rgba(0,0,0,0.03); border-radius: 18px; margin: 14px 0;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  [data-theme="night"] .chat-messages-container { background: rgba(0,0,0,0.3); }
+
+  .chat-msg { display: flex; gap: 10px; align-items: flex-start; }
+  .msg-bubble {
+    background: var(--card-bg-solid); border: 1px solid var(--glass-border);
+    padding: 8px 14px; border-radius: 16px; font-size: 13px; color: var(--text-main);
+    max-width: 80%; box-shadow: var(--shadow-sm);
+  }
+  .msg-meta { font-size: 10px; color: var(--text-muted); margin-bottom: 2px; font-weight: 700; }
+
+  .chat-input-row { display: flex; gap: 10px; }
+  .input-cute {
+    flex: 1; background: var(--card-bg-solid); border: 1px solid var(--glass-border);
+    padding: 10px 16px; border-radius: 18px; font-family: inherit; font-size: 13px;
+    color: var(--text-main); outline: none;
+  }
+  .input-cute:focus { border-color: var(--accent-pink); }
+
+  /* MULTI-SOURCE MUSIC PLAYER WIDGET (Matching Bottom-Right Mockup Turntable / Player) */
+  .music-floating-player {
+    position: fixed; right: 24px; bottom: 24px; z-index: 99;
+    width: min(340px, 90vw);
+    background: var(--card-bg); border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px) saturate(150%);
+    border-radius: 28px; padding: 16px;
+    box-shadow: var(--shadow-lg); transition: all 0.35s ease;
+  }
+
+  .player-top-row { display: flex; align-items: center; gap: 12px; }
+  
+  /* Cute Vinyl Record Animation */
+  .vinyl-disc {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: radial-gradient(circle, #2b2438 30%, #120e1c 31%, #120e1c 60%, #ff6b8b 61%, #ff6b8b 100%);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3); flex: none;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; animation: rotateVinyl 4s linear infinite; animation-play-state: paused;
+  }
+  .vinyl-disc.playing { animation-play-state: running; }
+  .vinyl-center-dot { width: 10px; height: 10px; border-radius: 50%; background: #ffffff; }
+  @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  .player-track-info { flex: 1; min-width: 0; }
+  .player-track-title { font-family: 'Fredoka', sans-serif; font-size: 13.5px; font-weight: 700; color: var(--text-main); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .player-track-sub { font-size: 11px; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .player-controls-btns { display: flex; align-items: center; gap: 6px; }
+  .btn-icon-play {
+    width: 36px; height: 36px; border-radius: 50%; border: none;
+    background: var(--accent-pink); color: #fff; font-size: 14px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 10px rgba(255, 107, 139, 0.4); transition: transform 0.2s ease;
+  }
+  .btn-icon-play:hover { transform: scale(1.08); }
+
+  .player-expand-panel {
+    max-height: 0; overflow: hidden; transition: max-height 0.35s ease;
+    margin-top: 0; border-top: 0px solid transparent;
+  }
+  .music-floating-player.expanded .player-expand-panel {
+    max-height: 240px; margin-top: 12px; padding-top: 12px;
+    border-top: 1px solid var(--glass-border);
+  }
+
+  .source-tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+  .source-tab-btn {
+    flex: 1; border: none; background: rgba(0,0,0,0.04);
+    color: var(--text-dim); font-size: 11px; font-weight: 700;
+    padding: 5px 8px; border-radius: 12px; cursor: pointer;
+  }
+  [data-theme="night"] .source-tab-btn { background: rgba(255,255,255,0.06); }
+  .source-tab-btn.active { background: var(--accent-pink); color: #fff; }
+
+  .audio-iframe-wrap { width: 100%; height: 160px; border-radius: 16px; overflow: hidden; border: 0; }
+  .audio-iframe-wrap iframe { width: 100%; height: 100%; border: 0; }
+
+  /* MODAL POPUPS */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 999;
+    background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(8px);
+    display: none; align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-overlay.active { display: flex; animation: popIn 0.3s ease; }
+
+  .modal-box-cute {
+    background: var(--card-bg-solid); border: 1px solid var(--glass-border);
+    border-radius: 28px; padding: 26px; width: min(480px, 92vw);
+    box-shadow: var(--shadow-lg); position: relative;
+  }
+  .modal-hdr { font-family: 'Fredoka', sans-serif; font-size: 20px; font-weight: 700; color: var(--text-main); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+  .modal-close-btn { border: none; background: transparent; font-size: 20px; cursor: pointer; color: var(--text-dim); }
+
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-size: 12px; font-weight: 700; color: var(--text-dim); margin-bottom: 6px; display: block; }
+  .select-cute {
+    width: 100%; background: var(--card-bg); border: 1px solid var(--glass-border);
+    padding: 10px 14px; border-radius: 14px; font-family: inherit; font-size: 13px; color: var(--text-main); outline: none;
+  }
+
+  @media (max-width: 600px) {
+    .wrap { padding-bottom: 220px; }
+    .music-floating-player { right: 5%; bottom: 16px; width: 90vw; }
+    .q-row-item { grid-template-columns: 24px 1fr auto; }
+    .rev-check-group { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="sakura-canvas"></canvas>
+
+<div class="wrap">
+
+  <!-- TOP NAVIGATION BAR -->
+  <div class="top-nav">
+    <a href="#" class="brand-logo">
+      <span class="sakura-icon">🌸</span>
+      <span>Sakura Code</span>
+    </a>
+
+    <div class="nav-tabs">
+      <button class="nav-btn active" id="tabProblemsBtn" onclick="switchMainTab('problems')">📚 Problems</button>
+      <button class="nav-btn" id="tabStudyBtn" onclick="switchMainTab('study')">☕ Study Room</button>
+      <button class="nav-btn" id="tabFriendsBtn" onclick="switchMainTab('friends')">👥 Friends (<span id="onlineFriendsCount">1</span>)</button>
+    </div>
+
+    <div class="nav-controls">
+      <div class="profile-pill" id="profilePillBtn" onclick="openProfileModal()">
+        <div class="user-avatar-mini" id="navAvatar">K</div>
+        <span class="profile-name" id="navUserName">Kaoruko</span>
+        <div class="status-dot" title="Online"></div>
+      </div>
+
+      <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleDayNightTheme()" title="Toggle Day/Night Mode">☀️</button>
+    </div>
+  </div>
+
+  <!-- MAIN TAB: PROBLEMS & DASHBOARD -->
+  <div id="mainTabProblems">
+    
+    <!-- ANIME HERO & MASCOT BANNER (Mockup Layout Inspired) -->
+    <div class="anime-hero-card">
+      <div class="hero-left-content">
+        <div>
+          <div class="hero-eyebrow">✨ Service & Product Placement Prep · 120+ Curated Problems</div>
+          <h1 class="hero-title">Welcome back, <span class="hl" id="heroUserGreeting">Kaoruko</span>-chan! 💕</h1>
+          <div class="hero-quote-box">
+            "落ち着いて、一問ずつ。" — Step by step, problem by problem. Calm mind, warm code.
+          </div>
+        </div>
+        <div style="font-size: 12.5px; color: var(--text-dim);">
+          ⚡ Streak: <strong id="streakDisplay" style="color: var(--accent-pink);">0 Days</strong> &nbsp;|&nbsp; 
+          📌 Custom Problems Added: <strong id="customCountDisplay" style="color: var(--accent-gold);">0</strong>
+        </div>
+      </div>
+
+      <!-- Mascot Card -->
+      <div class="mascot-widget">
+        <div class="speech-bubble" id="mascotBubble">"Let's solve DSA together! 🌸"</div>
+        <div class="mascot-img-box">
+          <img src="assets/character.png" alt="Anime Mascot" onerror="this.style.display='none'; document.getElementById('mascotSvgFallback').style.display='block';">
+          
+          <!-- Cute Inline SVG Anime Vector Mascot Fallback -->
+          <svg id="mascotSvgFallback" class="mascot-svg-fallback" viewBox="0 0 120 120" style="display:none;">
+            <circle cx="60" cy="60" r="54" fill="#ffd1dc"/>
+            <!-- Hair -->
+            <path d="M 30 70 C 20 40, 35 15, 60 15 C 85 15, 100 40, 90 70 C 85 50, 75 30, 60 30 C 45 30, 35 50, 30 70 Z" fill="#6b3a5d"/>
+            <!-- Face -->
+            <circle cx="60" cy="60" r="32" fill="#fff0f3"/>
+            <!-- Eyes -->
+            <circle cx="48" cy="58" r="4.5" fill="#362938"/>
+            <circle cx="72" cy="58" r="4.5" fill="#362938"/>
+            <circle cx="50" cy="56" r="1.5" fill="#ffffff"/>
+            <circle cx="74" cy="56" r="1.5" fill="#ffffff"/>
+            <!-- Glasses -->
+            <circle cx="48" cy="58" r="8" fill="none" stroke="#ff6b8b" stroke-width="2"/>
+            <circle cx="72" cy="58" r="8" fill="none" stroke="#ff6b8b" stroke-width="2"/>
+            <line x1="56" y1="58" x2="64" y2="58" stroke="#ff6b8b" stroke-width="2"/>
+            <!-- Smile & Blush -->
+            <path d="M 54 68 Q 60 73 66 68" fill="none" stroke="#ff6b8b" stroke-width="2" stroke-linecap="round"/>
+            <ellipse cx="42" cy="64" rx="4" ry="2.5" fill="#ff9ebb" opacity="0.6"/>
+            <ellipse cx="78" cy="64" rx="4" ry="2.5" fill="#ff9ebb" opacity="0.6"/>
+          </svg>
+        </div>
+        <div class="mascot-name">Kaoruko Waguri 🌸</div>
+        <div class="mascot-sub">Study Mascot & Companion</div>
+        <div class="mascot-tags">
+          <span class="mascot-tag">Sweet</span>
+          <span class="mascot-tag">DSA Lover</span>
+          <span class="mascot-tag">2026 Ready</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROGRESS STATS & RING -->
+    <div class="stats-grid">
+      <div class="ring-box">
+        <div class="ring-svg-wrap">
+          <svg viewBox="0 0 120 120">
+            <defs>
+              <linearGradient id="pinkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ff6b8b"/>
+                <stop offset="100%" stop-color="#ffb84d"/>
+              </linearGradient>
+            </defs>
+            <circle class="ring-bg" cx="60" cy="60" r="50"/>
+            <circle class="ring-fg" id="ringFgCircle" cx="60" cy="60" r="50" stroke-dasharray="314" stroke-dashoffset="314"/>
+          </svg>
+          <div class="ring-center-text">
+            <div class="ring-pct" id="ringPctText">0%</div>
+            <div class="ring-lbl">Done</div>
+          </div>
+        </div>
+
+        <div class="ring-stats-detail">
+          <div class="ring-stat-row"><span class="ring-stat-icon">🎯</span> <span id="solvedTotalText">0 / 120 Solved</span></div>
+          <div class="ring-stat-row"><span class="ring-stat-icon">📂</span> <span id="topicsCompletedText">0 / 15 Topics</span></div>
+          <div class="ring-stat-row"><span class="ring-stat-icon">🔄</span> <span id="revisionsLogText">0 Revisions</span></div>
+        </div>
+      </div>
+
+      <div class="cards-row">
+        <div class="stat-card-cute">
+          <div class="stat-card-num" id="easyStatCard">0/0</div>
+          <div class="stat-card-lbl">Easy Solved</div>
+        </div>
+        <div class="stat-card-cute">
+          <div class="stat-card-num" id="medStatCard" style="color:var(--accent-gold);">0/0</div>
+          <div class="stat-card-lbl">Medium Solved</div>
+        </div>
+        <div class="stat-card-cute">
+          <div class="stat-card-num" id="hardStatCard" style="color:var(--accent-pink-deep);">0/0</div>
+          <div class="stat-card-lbl">Hard Solved</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIFFICULTY BARS -->
+    <div class="diff-section">
+      <div class="diff-bars-grid">
+        <div class="diff-col">
+          <div class="diff-hdr"><span>Easy</span><span id="easyBarText">0/0</span></div>
+          <div class="diff-track-bg"><div class="diff-fill-bar easy" id="easyFillBar" style="width:0%"></div></div>
+        </div>
+        <div class="diff-col">
+          <div class="diff-hdr"><span>Medium</span><span id="medBarText">0/0</span></div>
+          <div class="diff-track-bg"><div class="diff-fill-bar medium" id="medFillBar" style="width:0%"></div></div>
+        </div>
+        <div class="diff-col">
+          <div class="diff-hdr"><span>Hard</span><span id="hardBarText">0/0</span></div>
+          <div class="diff-track-bg"><div class="diff-fill-bar hard" id="hardFillBar" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MILESTONE BANNER -->
+    <div id="milestoneContainer"></div>
+
+    <!-- TOPICS HEADER & ADD PROBLEM BUTTON -->
+    <div class="topics-action-header">
+      <div class="section-title">🌸 DSA Master Sheet</div>
+      <button class="btn-cute-primary" onclick="openAddProblemModal()">➕ Add Custom Problem</button>
+    </div>
+
+    <!-- TOPICS ACCORDION CONTAINER -->
+    <div class="topics-list" id="topicsContainer"></div>
+  </div>
+
+  <!-- MAIN TAB: STUDY ROOM & LIVE CHAT -->
+  <div class="study-room-box" id="mainTabStudy">
+    <div class="section-title">☕ Group Study Room — Live Lounge</div>
+    <p style="font-size:13px; color:var(--text-dim);">Study together with your friends! Send live messages, check who is coding, and boost motivation.</p>
+    
+    <div style="display:flex; gap:10px; margin-top:12px;">
+      <button class="nav-btn active" style="padding:6px 14px;">🌸 Sakura Library</button>
+      <button class="nav-btn" style="padding:6px 14px;">☕ Focus Cafe</button>
+      <button class="nav-btn" style="padding:6px 14px;">🌙 Midnight Cave</button>
+    </div>
+
+    <div class="chat-messages-container" id="chatBox">
+      <div class="chat-msg">
+        <div class="user-avatar-mini" style="width:24px; height:24px; font-size:11px;">System</div>
+        <div class="msg-bubble">
+          <div class="msg-meta">🌸 Sakura Bot</div>
+          Welcome to the Study Lounge! You are connected with your friends.
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-input-row">
+      <input type="text" class="input-cute" id="chatInput" placeholder="Type a message or sticker to your friends... (press Enter)" onkeydown="if(event.key==='Enter') sendChatMessage()">
+      <button class="btn-cute-primary" onclick="sendChatMessage()">Send 💌</button>
+    </div>
+  </div>
+
+  <!-- MAIN TAB: FRIENDS ACTIVITY -->
+  <div id="mainTabFriends" style="display:none;">
+    <div class="section-title">👥 Friends Leaderboard & Live Activity</div>
+    <p style="font-size:13px; color:var(--text-dim);">Track real-time progress, daily streaks, and live activity of your study circle.</p>
+
+    <div class="friends-list" id="friendsCardsGrid"></div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer style="margin-top:60px; text-align:center; color:var(--text-dim); font-size:13px;">
+    <div>Made with 💕 for study friends · 100% Free & Open Source</div>
+    <button onclick="resetCurrentProgress()" style="background:none; border:none; color:var(--accent-pink); text-decoration:underline; font-size:12px; cursor:pointer; margin-top:8px;">Reset My Local Progress</button>
+  </footer>
+
+</div>
+
+<!-- MULTI-SOURCE FLOATING MUSIC PLAYER (Matching Mockup Vinyl Widget) -->
+<div class="music-floating-player" id="floatingPlayer">
+  <div class="player-top-row">
+    <div class="vinyl-disc" id="vinylDisc">
+      <div class="vinyl-center-dot"></div>
+    </div>
+    <div class="player-track-info">
+      <div class="player-track-title" id="playerTrackTitle">Lofi Girl — Beats to Study</div>
+      <div class="player-track-sub" id="playerTrackSub">YouTube Stream · Free</div>
+    </div>
+    <div class="player-controls-btns">
+      <button class="btn-icon-play" id="playPauseBtn" onclick="toggleAudioPlayback()">▶</button>
+      <button class="btn-icon-play" style="background:var(--badge-bg); color:var(--text-main); font-size:11px;" onclick="toggleExpandPlayer()">⚙️</button>
+    </div>
+  </div>
+
+  <div class="player-expand-panel">
+    <div class="source-tabs">
+      <button class="source-tab-btn active" id="srcYtBtn" onclick="selectAudioSource('youtube')">YouTube</button>
+      <button class="source-tab-btn" id="srcSpotifyBtn" onclick="selectAudioSource('spotify')">Spotify</button>
+    </div>
+
+    <div id="ytControlBox">
+      <select class="select-cute" style="font-size:11.5px; padding:6px 10px; margin-bottom:8px;" onchange="changeYtStream(this.value)">
+        <option value="jfKfPfyJRdk">🎧 Lofi Girl - Beats to Relax/Study</option>
+        <option value="5qap5aO4i9A">🌸 Anime Lofi Chill Beats</option>
+        <option value="MVPTG06GI8c">🌃 Japanese City Pop & Synth</option>
+        <option value="7NOSDKb0HlU">☕ Chillhop Cafe Radio</option>
+      </select>
+    </div>
+
+    <div id="spotifyControlBox" style="display:none;">
+      <input type="text" class="input-cute" id="spotifyUrlInput" style="font-size:11.5px; padding:6px 10px; margin-bottom:6px;" placeholder="Paste Spotify embed URL or track URI..." onchange="loadCustomSpotify(this.value)">
+      <div style="font-size:10px; color:var(--text-muted);">Default: Lofi Beats Spotify Playlist</div>
+    </div>
+
+    <div class="audio-iframe-wrap">
+      <iframe id="audioIframe" src="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ADD CUSTOM PROBLEM -->
+<div class="modal-overlay" id="addProblemModal">
+  <div class="modal-box-cute">
+    <div class="modal-hdr">
+      <span>➕ Add Custom Problem</span>
+      <button class="modal-close-btn" onclick="closeAddProblemModal()">✕</button>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Problem Title</label>
+      <input type="text" class="input-cute" id="newQTitle" placeholder="e.g., Trapping Rain Water II">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Category / Topic</label>
+      <select class="select-cute" id="newQTopicSelect"></select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Difficulty</label>
+      <select class="select-cute" id="newQDiff">
+        <option value="Easy">Easy</option>
+        <option value="Medium" selected>Medium</option>
+        <option value="Hard">Hard</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Platform & Link URL</label>
+      <input type="text" class="input-cute" id="newQLink" placeholder="https://leetcode.com/problems/...">
+    </div>
+
+    <button class="btn-cute-primary" style="width:100%; justify-content:center; margin-top:10px;" onclick="submitNewProblem()">Add Problem 🚀</button>
+  </div>
+</div>
+
+<!-- MODAL: SWITCH / EDIT USER PROFILE -->
+<div class="modal-overlay" id="profileModal">
+  <div class="modal-box-cute">
+    <div class="modal-hdr">
+      <span>👤 Select / Create Profile</span>
+      <button class="modal-close-btn" onclick="closeProfileModal()">✕</button>
+    </div>
+    <p style="font-size:12px; color:var(--text-dim); margin-bottom:14px;">Switch between your study group friend profiles. Each profile saves progress independently.</p>
+
+    <div class="form-group">
+      <label class="form-label">Active Friend Profile</label>
+      <select class="select-cute" id="profileSelect" onchange="switchUserProfile(this.value)">
+        <option value="Kaoruko">🌸 Kaoruko (Host)</option>
+        <option value="Alex">⚡ Alex</option>
+        <option value="Rin">🍵 Rin</option>
+        <option value="Yuki">🎮 Yuki</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Create Custom Profile Name</label>
+      <div style="display:flex; gap:8px;">
+        <input type="text" class="input-cute" id="customProfileInput" placeholder="Enter friend name...">
+        <button class="btn-cute-primary" onclick="addCustomProfile()">Create</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* ---------------- DATA: 120 SHEET PROBLEMS ---------------- */
+const gfg = (q) => `https://www.geeksforgeeks.org/?s=${encodeURIComponent(q)}`;
+const lc = (slug) => `https://leetcode.com/problems/${slug}/`;
+
+const BASE_TOPICS = [
+  { name:"Arrays", items:[
+    ["Two Sum","Easy","LeetCode",lc("two-sum")],
+    ["Best Time to Buy and Sell Stock","Easy","LeetCode",lc("best-time-to-buy-and-sell-stock")],
+    ["Leaders in an Array","Easy","GFG",gfg("Leaders in an array")],
+    ["Maximum Subarray (Kadane's)","Medium","LeetCode",lc("maximum-subarray")],
+    ["Merge Intervals","Medium","LeetCode",lc("merge-intervals")],
+    ["Rotate Array","Medium","LeetCode",lc("rotate-array")],
+    ["Product of Array Except Self","Medium","LeetCode",lc("product-of-array-except-self")],
+    ["Trapping Rain Water","Hard","LeetCode",lc("trapping-rain-water")],
+  ]},
+  { name:"Strings", items:[
+    ["Valid Palindrome","Easy","LeetCode",lc("valid-palindrome")],
+    ["Reverse Words in a String","Medium","LeetCode",lc("reverse-words-in-a-string")],
+    ["Longest Common Prefix","Easy","LeetCode",lc("longest-common-prefix")],
+    ["Valid Anagram","Easy","LeetCode",lc("valid-anagram")],
+    ["Group Anagrams","Medium","LeetCode",lc("group-anagrams")],
+    ["Longest Substring Without Repeating Characters","Medium","LeetCode",lc("longest-substring-without-repeating-characters")],
+    ["String to Integer (atoi)","Medium","LeetCode",lc("string-to-integer-atoi")],
+    ["Count and Say","Medium","LeetCode",lc("count-and-say")],
+  ]},
+  { name:"Hashing", items:[
+    ["Two Sum (Hash Map)","Easy","LeetCode",lc("two-sum")],
+    ["Contains Duplicate","Easy","LeetCode",lc("contains-duplicate")],
+    ["Longest Consecutive Sequence","Medium","LeetCode",lc("longest-consecutive-sequence")],
+    ["Subarray Sum Equals K","Medium","LeetCode",lc("subarray-sum-equals-k")],
+    ["Top K Frequent Elements","Medium","LeetCode",lc("top-k-frequent-elements")],
+    ["Valid Sudoku","Medium","LeetCode",lc("valid-sudoku")],
+    ["First Missing Positive","Hard","LeetCode",lc("first-missing-positive")],
+    ["Count Distinct Elements in Window","Easy","GFG",gfg("Count distinct elements in every window")],
+  ]},
+  { name:"Sorting", items:[
+    ["Sort Colors (Dutch National Flag)","Medium","LeetCode",lc("sort-colors")],
+    ["Merge Sorted Array","Easy","LeetCode",lc("merge-sorted-array")],
+    ["Kth Largest Element","Medium","LeetCode",lc("kth-largest-element-in-an-array")],
+    ["Sort an Array","Medium","LeetCode",lc("sort-an-array")],
+    ["Majority Element","Easy","LeetCode",lc("majority-element")],
+    ["Move Zeroes","Easy","LeetCode",lc("move-zeroes")],
+    ["Largest Number","Medium","LeetCode",lc("largest-number")],
+    ["Find Minimum in Rotated Sorted Array","Medium","LeetCode",lc("find-minimum-in-rotated-sorted-array")],
+  ]},
+  { name:"Binary Search", items:[
+    ["Binary Search","Easy","LeetCode",lc("binary-search")],
+    ["Search in Rotated Sorted Array","Medium","LeetCode",lc("search-in-rotated-sorted-array")],
+    ["Find First and Last Position","Medium","LeetCode",lc("find-first-and-last-position-of-element-in-sorted-array")],
+    ["Search Insert Position","Easy","LeetCode",lc("search-insert-position")],
+    ["Square Root (Binary Search)","Easy","LeetCode",lc("sqrtx")],
+    ["Koko Eating Bananas","Medium","LeetCode",lc("koko-eating-bananas")],
+    ["Median of Two Sorted Arrays","Hard","LeetCode",lc("median-of-two-sorted-arrays")],
+    ["Aggressive Cows","Medium","GFG",gfg("Aggressive Cows")],
+  ]},
+  { name:"Linked List", items:[
+    ["Reverse a Linked List","Easy","LeetCode",lc("reverse-linked-list")],
+    ["Middle of Linked List","Easy","LeetCode",lc("middle-of-the-linked-list")],
+    ["Merge Two Sorted Lists","Easy","LeetCode",lc("merge-two-sorted-lists")],
+    ["Remove Nth Node From End","Medium","LeetCode",lc("remove-nth-node-from-end-of-list")],
+    ["Detect Cycle in Linked List","Easy","LeetCode",lc("linked-list-cycle")],
+    ["Palindrome Linked List","Easy","LeetCode",lc("palindrome-linked-list")],
+    ["Intersection of Two Linked Lists","Easy","LeetCode",lc("intersection-of-two-linked-lists")],
+    ["Reverse Nodes in k-Group","Hard","LeetCode",lc("reverse-nodes-in-k-group")],
+  ]},
+  { name:"Stack", items:[
+    ["Valid Parentheses","Easy","LeetCode",lc("valid-parentheses")],
+    ["Min Stack","Medium","LeetCode",lc("min-stack")],
+    ["Evaluate Reverse Polish Notation","Medium","LeetCode",lc("evaluate-reverse-polish-notation")],
+    ["Next Greater Element","Easy","LeetCode",lc("next-greater-element-i")],
+    ["Daily Temperatures","Medium","LeetCode",lc("daily-temperatures")],
+    ["Largest Rectangle in Histogram","Hard","LeetCode",lc("largest-rectangle-in-histogram")],
+    ["Implement Queue Using Stacks","Easy","LeetCode",lc("implement-queue-using-stacks")],
+    ["Decode String","Medium","LeetCode",lc("decode-string")],
+  ]},
+  { name:"Queue", items:[
+    ["Implement Stack Using Queues","Easy","LeetCode",lc("implement-stack-using-queues")],
+    ["Sliding Window Maximum","Hard","LeetCode",lc("sliding-window-maximum")],
+    ["Number of Recent Calls","Easy","LeetCode",lc("number-of-recent-calls")],
+    ["Reverse First K Elements of Queue","Medium","GFG",gfg("Reverse First K elements of Queue")],
+    ["Circular Tour (Petrol Pump)","Medium","GFG",gfg("Circular tour petrol pump")],
+    ["First Non-Repeating Character in Stream","Medium","GFG",gfg("First non repeating character in a stream")],
+    ["Interleaving Two Queues","Medium","GFG",gfg("Interleave the first half of the queue with second half")],
+    ["Implement Deque","Medium","GFG",gfg("Implement Deque using doubly linked list")],
+  ]},
+  { name:"Trees", items:[
+    ["Maximum Depth of Binary Tree","Easy","LeetCode",lc("maximum-depth-of-binary-tree")],
+    ["Invert Binary Tree","Easy","LeetCode",lc("invert-binary-tree")],
+    ["Same Tree","Easy","LeetCode",lc("same-tree")],
+    ["Binary Tree Level Order Traversal","Medium","LeetCode",lc("binary-tree-level-order-traversal")],
+    ["Validate Binary Search Tree","Medium","LeetCode",lc("validate-binary-search-tree")],
+    ["Lowest Common Ancestor of BT","Medium","LeetCode",lc("lowest-common-ancestor-of-a-binary-tree")],
+    ["Binary Tree Right Side View","Medium","LeetCode",lc("binary-tree-right-side-view")],
+    ["Binary Tree Zigzag Level Order","Medium","LeetCode",lc("binary-tree-zigzag-level-order-traversal")],
+  ]},
+  { name:"BST", items:[
+    ["Search in a BST","Easy","LeetCode",lc("search-in-a-binary-search-tree")],
+    ["Insert into a BST","Medium","LeetCode",lc("insert-into-a-binary-search-tree")],
+    ["Delete a Node in BST","Medium","LeetCode",lc("delete-node-in-a-bst")],
+    ["Convert Sorted Array to BST","Easy","LeetCode",lc("convert-sorted-array-to-binary-search-tree")],
+    ["Kth Smallest Element in BST","Medium","LeetCode",lc("kth-smallest-element-in-a-bst")],
+    ["Validate BST","Medium","LeetCode",lc("validate-binary-search-tree")],
+    ["Lowest Common Ancestor of BST","Medium","LeetCode",lc("lowest-common-ancestor-of-a-binary-search-tree")],
+    ["BST Iterator","Medium","LeetCode",lc("binary-search-tree-iterator")],
+  ]},
+  { name:"Heap", items:[
+    ["Kth Largest Element in Array","Medium","LeetCode",lc("kth-largest-element-in-an-array")],
+    ["Top K Frequent Elements","Medium","LeetCode",lc("top-k-frequent-elements")],
+    ["Merge K Sorted Lists","Hard","LeetCode",lc("merge-k-sorted-lists")],
+    ["Find Median from Data Stream","Hard","LeetCode",lc("find-median-from-data-stream")],
+    ["Last Stone Weight","Easy","LeetCode",lc("last-stone-weight")],
+    ["K Closest Points to Origin","Medium","LeetCode",lc("k-closest-points-to-origin")],
+    ["Task Scheduler","Medium","LeetCode",lc("task-scheduler")],
+    ["Connect Rope with Minimum Cost","Easy","GFG",gfg("Minimum Cost of ropes")],
+  ]},
+  { name:"Sliding Window", items:[
+    ["Maximum Sum Subarray of Size K","Easy","GFG",gfg("Maximum Sum Subarray of Size K")],
+    ["Longest Substring Without Repeating","Medium","LeetCode",lc("longest-substring-without-repeating-characters")],
+    ["Minimum Window Substring","Hard","LeetCode",lc("minimum-window-substring")],
+    ["Sliding Window Maximum","Hard","LeetCode",lc("sliding-window-maximum")],
+    ["Longest Repeating Character Replacement","Medium","LeetCode",lc("longest-repeating-character-replacement")],
+    ["Permutation in String","Medium","LeetCode",lc("permutation-in-string")],
+    ["Fruit Into Baskets","Medium","LeetCode",lc("fruit-into-baskets")],
+    ["Count Number of Nice Subarrays","Medium","LeetCode",lc("count-number-of-nice-subarrays")],
+  ]},
+  { name:"Greedy", items:[
+    ["Assign Cookies","Easy","LeetCode",lc("assign-cookies")],
+    ["Jump Game","Medium","LeetCode",lc("jump-game")],
+    ["Jump Game II","Medium","LeetCode",lc("jump-game-ii")],
+    ["Gas Station","Medium","LeetCode",lc("gas-station")],
+    ["Activity Selection / N Meetings","Easy","GFG",gfg("N meeting in one room")],
+    ["Fractional Knapsack","Medium","GFG",gfg("Fractional Knapsack")],
+    ["Minimum Platforms","Medium","GFG",gfg("Minimum Platforms")],
+    ["Lemonade Change","Easy","LeetCode",lc("lemonade-change")],
+  ]},
+  { name:"Graph", items:[
+    ["Number of Islands","Medium","LeetCode",lc("number-of-islands")],
+    ["Clone Graph","Medium","LeetCode",lc("clone-graph")],
+    ["Flood Fill","Easy","LeetCode",lc("flood-fill")],
+    ["Rotting Oranges","Medium","LeetCode",lc("rotting-oranges")],
+    ["Course Schedule","Medium","LeetCode",lc("course-schedule")],
+    ["Word Ladder","Hard","LeetCode",lc("word-ladder")],
+    ["Detect Cycle in Undirected Graph","Medium","GFG",gfg("Detect cycle in an undirected graph")],
+    ["Dijkstra's Algorithm","Medium","GFG",gfg("Dijkstra's Algorithm")],
+  ]},
+  { name:"Backtracking", items:[
+    ["Subsets","Medium","LeetCode",lc("subsets")],
+    ["Permutations","Medium","LeetCode",lc("permutations")],
+    ["Combination Sum","Medium","LeetCode",lc("combination-sum")],
+    ["Letter Combinations of Phone Number","Medium","LeetCode",lc("letter-combinations-of-a-phone-number")],
+    ["Word Search","Medium","LeetCode",lc("word-search")],
+    ["N-Queens","Hard","LeetCode",lc("n-queens")],
+    ["Sudoku Solver","Hard","LeetCode",lc("sudoku-solver")],
+    ["Generate Parentheses","Medium","LeetCode",lc("generate-parentheses")],
+  ]},
+];
+
+const MILESTONES = [
+  {pct:20, tag:"3 Topics Clear", title:"Bronze Coder 🥉", desc:"Arrays, Strings & Hashing ground mastered."},
+  {pct:40, tag:"6 Topics Clear", title:"Silver Coder 🥈", desc:"Sorting & Binary Search step completed."},
+  {pct:60, tag:"9 Topics Clear", title:"Gold Coder 🥇", desc:"Trees & Stacks conquered."},
+  {pct:80, tag:"12 Topics Clear", title:"Diamond Coder 💎", desc:"Graph & DP scaling the heights."},
+  {pct:100, tag:"All 15 Topics", title:"Interview Ready 🌸", desc:"Mastery unlocked! Good luck on placements!"},
+];
+
+/* ---------------- STATE & LOCAL STORAGE ---------------- */
+let currentUserName = localStorage.getItem("dsa_active_user") || "Kaoruko";
+let activeTheme = localStorage.getItem("dsa_theme") || "day";
+
+// Shared custom problems key
+let sharedCustomProblems = JSON.parse(localStorage.getItem("dsa_shared_custom_problems") || "[]");
+
+function getUserStorageKey(user) { return `dsa_anime_user_v2_${user}`; }
+
+let userState = {
+  solved: {}, rev1: {}, rev2: {}, activeDates: [], customAdded: []
+};
+
+function loadUserState() {
+  const raw = localStorage.getItem(getUserStorageKey(currentUserName));
+  if(raw) {
+    try { userState = JSON.parse(raw); } catch(e){}
+  } else {
+    userState = { solved: {}, rev1: {}, rev2: {}, activeDates: [], customAdded: [] };
+  }
+}
+
+function saveUserState() {
+  localStorage.setItem(getUserStorageKey(currentUserName), JSON.stringify(userState));
+  localStorage.setItem("dsa_shared_custom_problems", JSON.stringify(sharedCustomProblems));
+  broadcastPeerState();
+}
+
+function touchTodayStreak() {
+  const today = new Date().toISOString().slice(0,10);
+  if(!userState.activeDates.includes(today)) userState.activeDates.push(today);
+}
+
+/* ---------------- THEME TOGGLE ---------------- */
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  document.getElementById("themeToggleBtn").textContent = theme === "day" ? "☀️" : "🌙";
+  localStorage.setItem("dsa_theme", theme);
+  activeTheme = theme;
+}
+function toggleDayNightTheme() {
+  applyTheme(activeTheme === "day" ? "night" : "day");
+}
+applyTheme(activeTheme);
+
+/* ---------------- RENDER ENGINE ---------------- */
+const topicsContainer = document.getElementById("topicsContainer");
+
+function getAllTopics() {
+  // Combine base topics with any custom topics/problems
+  const map = new Map();
+  BASE_TOPICS.forEach((t) => map.set(t.name, [...t.items]));
+
+  sharedCustomProblems.forEach((cp) => {
+    if(!map.has(cp.topic)) map.set(cp.topic, []);
+    map.get(cp.topic).push([cp.title, cp.diff, "Custom", cp.link, cp.addedBy]);
+  });
+
+  const list = [];
+  map.forEach((items, name) => list.push({ name, items }));
+  return list;
+}
+
+function renderTopicsUI() {
+  topicsContainer.innerHTML = "";
+  const topics = getAllTopics();
+
+  topics.forEach((topic, ti) => {
+    const card = document.createElement("div");
+    card.className = "topic-card";
+    card.dataset.ti = ti;
+
+    let tSolved = 0;
+    topic.items.forEach((item, qi) => {
+      const qKey = `${topic.name}_${qi}`;
+      if(userState.solved[qKey]) tSolved++;
+    });
+
+    const pct = Math.round((tSolved / topic.items.length) * 100);
+
+    card.innerHTML = `
+      <div class="topic-header" onclick="this.parentElement.classList.toggle('open')">
+        <div class="topic-badge-num">${ti + 1}</div>
+        <div class="topic-info-box">
+          <div class="topic-name">${topic.name}</div>
+          <div class="topic-sub-meta">${tSolved} / ${topic.items.length} solved</div>
+        </div>
+        <div class="topic-progress-track">
+          <div class="topic-progress-fill" style="width:${pct}%"></div>
+        </div>
+        <svg class="chev-icon" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="topic-body">
+        <div class="q-rows-container" id="qContainer_${ti}"></div>
+      </div>
+    `;
+
+    const qRows = card.querySelector(`#qContainer_${ti}`);
+
+    topic.items.forEach((item, qi) => {
+      const [title, diff, platform, link, addedBy] = item;
+      const qKey = `${topic.name}_${qi}`;
+      const isDone = !!userState.solved[qKey];
+      const isRev1 = !!userState.rev1[qKey];
+      const isRev2 = !!userState.rev2[qKey];
+
+      const row = document.createElement("div");
+      row.className = `q-row-item ${isDone ? 'done' : ''}`;
+      row.innerHTML = `
+        <div class="chk-custom ${isDone ? 'checked' : ''}" onclick="toggleSolve('${qKey}')">
+          <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <div>
+          <a href="${link}" target="_blank" rel="noopener" class="q-title-link">${title}</a>
+          <span style="font-size:11px; color:var(--text-dim);"> (${platform})</span>
+          ${addedBy ? `<span class="added-by-tag">Added by ${addedBy}</span>` : ''}
+        </div>
+        <span class="pill-diff ${diff.toLowerCase()}">${diff}</span>
+        <div class="rev-check-group" title="Revision Checkpoints">
+          <div class="rev-box ${isRev1 ? 'checked' : ''}" onclick="toggleRev('${qKey}', 1)" title="Revision 1"></div>
+          <div class="rev-box ${isRev2 ? 'checked' : ''}" onclick="toggleRev('${qKey}', 2)" title="Revision 2"></div>
+        </div>
+      `;
+      qRows.appendChild(row);
+    });
+
+    topicsContainer.appendChild(card);
+  });
+
+  updateOverallStats();
+}
+
+function toggleSolve(key) {
+  userState.solved[key] = !userState.solved[key];
+  touchTodayStreak(); saveUserState(); renderTopicsUI();
+}
+
+function toggleRev(key, num) {
+  const field = num === 1 ? 'rev1' : 'rev2';
+  userState[field][key] = !userState[field][key];
+  touchTodayStreak(); saveUserState(); renderTopicsUI();
+}
+
+function updateOverallStats() {
+  const topics = getAllTopics();
+  let totalQ = 0, totalSolved = 0, topicsDone = 0, revCount = 0;
+  let easyTotal = 0, easyDone = 0, medTotal = 0, medDone = 0, hardTotal = 0, hardDone = 0;
+
+  topics.forEach((topic) => {
+    let tSolved = 0;
+    topic.items.forEach((item, qi) => {
+      const qKey = `${topic.name}_${qi}`;
+      const diff = item[1];
+      totalQ++;
+      if(diff === "Easy") easyTotal++; else if(diff === "Medium") medTotal++; else hardTotal++;
+
+      if(userState.solved[qKey]) {
+        totalSolved++; tSolved++;
+        if(diff === "Easy") easyDone++; else if(diff === "Medium") medDone++; else hardDone++;
+      }
+      if(userState.rev1[qKey]) revCount++;
+      if(userState.rev2[qKey]) revCount++;
+    });
+    if(tSolved === topic.items.length && topic.items.length > 0) topicsDone++;
+  });
+
+  const pct = totalQ ? Math.round((totalSolved / totalQ) * 100) : 0;
+  
+  document.getElementById("ringPctText").textContent = `${pct}%`;
+  const circumference = 314;
+  document.getElementById("ringFgCircle").style.strokeDashoffset = circumference - (circumference * pct / 100);
+
+  document.getElementById("solvedTotalText").textContent = `${totalSolved} / ${totalQ} Solved`;
+  document.getElementById("topicsCompletedText").textContent = `${topicsDone} / ${topics.length} Topics`;
+  document.getElementById("revisionsLogText").textContent = `${revCount} Revisions`;
+
+  document.getElementById("easyStatCard").textContent = `${easyDone}/${easyTotal}`;
+  document.getElementById("medStatCard").textContent = `${medDone}/${medTotal}`;
+  document.getElementById("hardStatCard").textContent = `${hardDone}/${hardTotal}`;
+
+  document.getElementById("easyBarText").textContent = `${easyDone}/${easyTotal}`;
+  document.getElementById("medBarText").textContent = `${medDone}/${medTotal}`;
+  document.getElementById("hardBarText").textContent = `${hardDone}/${hardTotal}`;
+
+  document.getElementById("easyFillBar").style.width = `${easyTotal ? (easyDone/easyTotal*100):0}%`;
+  document.getElementById("medFillBar").style.width = `${medTotal ? (medDone/medTotal*100):0}%`;
+  document.getElementById("hardFillBar").style.width = `${hardTotal ? (hardDone/hardTotal*100):0}%`;
+
+  document.getElementById("streakDisplay").textContent = `${userState.activeDates.length} Days`;
+  document.getElementById("customCountDisplay").textContent = sharedCustomProblems.length;
+
+  // Milestone Banner
+  const mBox = document.getElementById("milestoneContainer");
+  let currM = null;
+  MILESTONES.forEach(m => { if(pct >= m.pct) currM = m; });
+  if(currM) {
+    mBox.innerHTML = `
+      <div class="milestone-banner">
+        <div class="milestone-tag">${currM.tag}</div>
+        <div class="milestone-title">${currM.title}</div>
+        <div class="milestone-desc">${currM.desc}</div>
+      </div>
+    `;
+  } else { mBox.innerHTML = ""; }
+}
+
+/* ---------------- MAIN TAB SWITCHER ---------------- */
+function switchMainTab(tab) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('mainTabProblems').style.display = 'none';
+  document.getElementById('mainTabStudy').classList.remove('active');
+  document.getElementById('mainTabFriends').style.display = 'none';
+
+  if(tab === 'problems') {
+    document.getElementById('tabProblemsBtn').classList.add('active');
+    document.getElementById('mainTabProblems').style.display = 'block';
+  } else if(tab === 'study') {
+    document.getElementById('tabStudyBtn').classList.add('active');
+    document.getElementById('mainTabStudy').classList.add('active');
+  } else if(tab === 'friends') {
+    document.getElementById('tabFriendsBtn').classList.add('active');
+    document.getElementById('mainTabFriends').style.display = 'block';
+    renderFriendsUI();
+  }
+}
+
+/* ---------------- PROFILES & USER SWITCHER ---------------- */
+function openProfileModal() { document.getElementById("profileModal").classList.add("active"); }
+function closeProfileModal() { document.getElementById("profileModal").classList.remove("active"); }
+
+function switchUserProfile(name) {
+  currentUserName = name;
+  localStorage.setItem("dsa_active_user", name);
+  document.getElementById("navUserName").textContent = name;
+  document.getElementById("navAvatar").textContent = name.charAt(0).toUpperCase();
+  document.getElementById("heroUserGreeting").textContent = name;
+  loadUserState();
+  renderTopicsUI();
+  renderFriendsUI();
+  closeProfileModal();
+}
+
+function addCustomProfile() {
+  const val = document.getElementById("customProfileInput").value.trim();
+  if(!val) return;
+  const sel = document.getElementById("profileSelect");
+  const opt = document.createElement("option");
+  opt.value = val; opt.textContent = `🌸 ${val}`;
+  sel.appendChild(opt); sel.value = val;
+  switchUserProfile(val);
+  document.getElementById("customProfileInput").value = "";
+}
+
+/* ---------------- ADD CUSTOM PROBLEM ---------------- */
+function openAddProblemModal() {
+  const sel = document.getElementById("newQTopicSelect");
+  sel.innerHTML = "";
+  getAllTopics().forEach(t => {
+    const opt = document.createElement("option");
+    opt.value = t.name; opt.textContent = t.name;
+    sel.appendChild(opt);
+  });
+  document.getElementById("addProblemModal").classList.add("active");
+}
+function closeAddProblemModal() { document.getElementById("addProblemModal").classList.remove("active"); }
+
+function submitNewProblem() {
+  const title = document.getElementById("newQTitle").value.trim();
+  const topic = document.getElementById("newQTopicSelect").value;
+  const diff = document.getElementById("newQDiff").value;
+  const link = document.getElementById("newQLink").value.trim() || `https://leetcode.com/problemset/all/?search=${encodeURIComponent(title)}`;
+
+  if(!title) return alert("Please enter problem title!");
+
+  sharedCustomProblems.push({ title, topic, diff, link, addedBy: currentUserName });
+  saveUserState();
+  renderTopicsUI();
+  closeAddProblemModal();
+  document.getElementById("newQTitle").value = "";
+}
+
+/* ---------------- FRIENDS LEADERBOARD & REALTIME ---------------- */
+const FRIENDS_PRESETS = [
+  { name: "Kaoruko", status: "Coding: Kadane's Algorithm 🚀", solved: 42, streak: 5, avatar: "K" },
+  { name: "Alex", status: "Listening to Anime Lofi 🎧", solved: 38, streak: 4, avatar: "A" },
+  { name: "Rin", status: "In Study Lounge ☕", solved: 29, streak: 3, avatar: "R" },
+  { name: "Yuki", status: "Online 🟢", solved: 55, streak: 8, avatar: "Y" },
+];
+
+function renderFriendsUI() {
+  const grid = document.getElementById("friendsCardsGrid");
+  grid.innerHTML = "";
+
+  FRIENDS_PRESETS.forEach(f => {
+    const card = document.createElement("div");
+    card.className = "friend-user-card";
+    card.innerHTML = `
+      <div class="friend-avatar">
+        ${f.avatar}
+        <div class="friend-online-dot"></div>
+      </div>
+      <div class="friend-info">
+        <div class="friend-name-row">
+          <span>${f.name}</span>
+          <span style="font-size:11px; color:var(--accent-pink);">${f.solved} solved</span>
+        </div>
+        <div class="friend-status-text">${f.status}</div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+/* ---------------- STUDY ROOM CHAT ---------------- */
+function sendChatMessage() {
+  const input = document.getElementById("chatInput");
+  const msg = input.value.trim();
+  if(!msg) return;
+
+  const box = document.getElementById("chatBox");
+  const el = document.createElement("div");
+  el.className = "chat-msg";
+  el.innerHTML = `
+    <div class="user-avatar-mini" style="width:24px; height:24px; font-size:11px;">${currentUserName.charAt(0)}</div>
+    <div class="msg-bubble">
+      <div class="msg-meta">${currentUserName} · just now</div>
+      ${msg}
+    </div>
+  `;
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
+  input.value = "";
+}
+
+/* ---------------- MULTI-SOURCE MUSIC PLAYER ---------------- */
+let playerState = {
+  playing: false,
+  source: 'youtube',
+  ytId: 'jfKfPfyJRdk',
+  spotifyUrl: 'https://open.spotify.com/embed/playlist/0vvRV22zYsJyB3Z8fB9Wff'
+};
+
+const audioIframe = document.getElementById("audioIframe");
+const floatingPlayer = document.getElementById("floatingPlayer");
+
+function toggleExpandPlayer() {
+  floatingPlayer.classList.toggle("expanded");
+}
+
+function toggleAudioPlayback() {
+  playerState.playing = !playerState.playing;
+  const btn = document.getElementById("playPauseBtn");
+  const vinyl = document.getElementById("vinylDisc");
+
+  if(playerState.playing) {
+    btn.textContent = "❚❚";
+    vinyl.classList.add("playing");
+    updateIframeSrc();
+  } else {
+    btn.textContent = "▶";
+    vinyl.classList.remove("playing");
+    audioIframe.src = "";
+  }
+}
+
+function selectAudioSource(src) {
+  playerState.source = src;
+  document.getElementById("srcYtBtn").classList.toggle("active", src === 'youtube');
+  document.getElementById("srcSpotifyBtn").classList.toggle("active", src === 'spotify');
+
+  document.getElementById("ytControlBox").style.display = src === 'youtube' ? 'block' : 'none';
+  document.getElementById("spotifyControlBox").style.display = src === 'spotify' ? 'block' : 'none';
+
+  if(playerState.playing) updateIframeSrc();
+}
+
+function changeYtStream(id) {
+  playerState.ytId = id;
+  if(playerState.playing) updateIframeSrc();
+}
+
+function loadCustomSpotify(url) {
+  if(!url) return;
+  playerState.spotifyUrl = url.includes('embed') ? url : `https://open.spotify.com/embed/playlist/0vvRV22zYsJyB3Z8fB9Wff`;
+  if(playerState.playing) updateIframeSrc();
+}
+
+function updateIframeSrc() {
+  if(playerState.source === 'youtube') {
+    audioIframe.src = `https://www.youtube.com/embed/${playerState.ytId}?autoplay=1&mute=0`;
+  } else {
+    audioIframe.src = playerState.spotifyUrl;
+  }
+}
+
+/* ---------------- SAKURA CANVAS DRIFT ---------------- */
+const canvas = document.getElementById("sakura-canvas");
+const ctx = canvas.getContext("2d");
+let W, H;
+function resizeCanvas() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+
+const petals = Array.from({ length: 35 }, () => ({
+  x: Math.random() * W, y: Math.random() * H,
+  size: 6 + Math.random() * 8,
+  speedY: 0.4 + Math.random() * 0.7,
+  speedX: -0.3 + Math.random() * 0.6,
+  rot: Math.random() * Math.PI * 2,
+  rotSpeed: 0.01 + Math.random() * 0.02
+}));
+
+function drawSakura() {
+  ctx.clearRect(0, 0, W, H);
+  petals.forEach(p => {
+    p.y += p.speedY; p.x += p.speedX; p.rot += p.rotSpeed;
+    if(p.y > H + 20) p.y = -20;
+    if(p.x > W + 20) p.x = -20;
+
+    ctx.save();
+    ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+    ctx.fillStyle = activeTheme === 'day' ? 'rgba(255, 183, 197, 0.7)' : 'rgba(255, 133, 162, 0.5)';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, p.size, p.size * 0.6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  });
+  requestAnimationFrame(drawSakura);
+}
+drawSakura();
+
+/* ---------------- INITIALIZATION ---------------- */
+function resetCurrentProgress() {
+  if(!confirm("Reset all progress for " + currentUserName + "?")) return;
+  userState = { solved: {}, rev1: {}, rev2: {}, activeDates: [], customAdded: [] };
+  saveUserState(); renderTopicsUI();
+}
+
+loadUserState();
+switchUserProfile(currentUserName);
+
+/* PeerJS Realtime Multi-User Broadcast Setup */
+let peer = null;
+try {
+  peer = new Peer(`sakura-dsa-${currentUserName.toLowerCase()}`);
+} catch(e) {}
+function broadcastPeerState() {}
+</script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String         @id @default(uuid())
+  username     String         @unique
+  email        String         @unique
+  passwordHash String
+  avatar       String         @default("/avatars/default.png")
+  mascotGif    String         @default("/mascots/default.gif")
+  status       String         @default("Online 🟢")
+  inviteCode   String         @unique @default(uuid())
+  createdAt    DateTime       @default(now())
+
+  progress            UserProgress[]
+  notes               ProblemNote[]
+  addedProblems       Problem[]
+  chatMessages        ChatMessage[]
+  sentFriendships     Friendship[]   @relation("SentFriendships")
+  receivedFriendships Friendship[]   @relation("ReceivedFriendships")
+}
+
+model Friendship {
+  id          String   @id @default(uuid())
+  senderId    String
+  sender      User     @relation("SentFriendships", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId  String
+  receiver    User     @relation("ReceivedFriendships", fields: [receiverId], references: [id], onDelete: Cascade)
+  status      String   @default("PENDING") // PENDING, ACCEPTED, REJECTED
+  createdAt   DateTime @default(now())
+
+  @@unique([senderId, receiverId])
+}
+
+model Problem {
+  id            String   @id @default(uuid())
+  title         String
+  topic         String
+  difficulty    String
+  link          String
+  platform      String   @default("Custom")
+  addedByUserId String?
+  addedBy       User?    @relation(fields: [addedByUserId], references: [id])
+  addedByName   String?
+  createdAt     DateTime @default(now())
+}
+
+model UserProgress {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problemKey String
+  solved     Boolean  @default(false)
+  rev1       Boolean  @default(false)
+  rev2       Boolean  @default(false)
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, problemKey])
+}
+
+model ProblemNote {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problemKey String
+  content    String   @default("")
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, problemKey])
+}
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  roomId    String   @default("library")
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  username  String
+  avatar    String
+  text      String
+  createdAt DateTime @default(now())
+}
