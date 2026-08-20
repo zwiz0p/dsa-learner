@@ -4,9 +4,10 @@ import { hashPassword, signToken } from '../../../../lib/auth';
 
 export async function POST(req) {
   try {
-    const { username, email, password, avatar, mascotGif } = await req.json();
+    const { name, username, email, password, avatar, mascotGif } = await req.json();
 
-    const cleanUsername = username?.trim();
+    const cleanName = name?.trim() || username?.trim();
+    const cleanUsername = username?.trim()?.toLowerCase();
     const cleanEmail = email?.trim()?.toLowerCase();
 
     if (!cleanUsername || !cleanEmail || !password) {
@@ -34,6 +35,7 @@ export async function POST(req) {
     const passwordHash = await hashPassword(password);
     const user = await db.user.create({
       data: {
+        name: cleanName,
         username: cleanUsername,
         email: cleanEmail,
         passwordHash,
@@ -49,6 +51,7 @@ export async function POST(req) {
       message: 'Signup successful',
       user: {
         id: user.id,
+        name: user.name,
         username: user.username,
         email: user.email,
         avatar: user.avatar,

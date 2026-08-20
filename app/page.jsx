@@ -526,7 +526,7 @@ export default function DashboardPage() {
                   <div className="hero-left-content">
                     <div>
                       <div className="hero-eyebrow">✨ Placement Prep · 120+ Curated Problems</div>
-                      <h1 className="hero-title">Welcome back, <span className="hl">{user.username}</span>! 💕</h1>
+                      <h1 className="hero-title">Welcome back, <span className="hl">{user.name || user.username}</span>! 💕</h1>
                       <div className="hero-quote-box">
                         "落ち着いて、一問ずつ。" — Step by step, problem by problem.
                       </div>
@@ -1006,11 +1006,26 @@ export default function DashboardPage() {
             </div>
 
             <form onSubmit={handleSaveProfileSettings}>
-              {/* Custom Profile Photo Upload / URL */}
-              <div style={{ marginBottom: '14px' }}>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '4px' }}>Profile Photo URL / Upload Image</label>
-                <input type="text" className="input-cute" value={profilePhotoUrl} onChange={(e) => setProfilePhotoUrl(e.target.value)} placeholder="/avatars/default.png or image URL..." style={{ marginBottom: '6px' }} />
-                <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, setProfilePhotoUrl)} style={{ fontSize: '11px' }} />
+              {/* Preset Profile Photo Selection (No Upload for PFPs) */}
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '6px' }}>Select Profile Photo (PFP)</label>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                  {['/avatars/default.png', '/avatars/annoyed.jpg', '/avatars/avatar1.png', '/avatars/avatar2.png', '/avatars/avatar3.png', '/avatars/avatar4.png', '/avatars/avatar5.png'].map((imgUrl) => (
+                    <img
+                      key={imgUrl}
+                      src={imgUrl}
+                      alt="PFP"
+                      onClick={() => setProfilePhotoUrl(imgUrl)}
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                      style={{
+                        width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', cursor: 'pointer',
+                        border: profilePhotoUrl === imgUrl ? '3px solid var(--accent-pink)' : '2px solid var(--glass-border)',
+                        boxShadow: profilePhotoUrl === imgUrl ? '0 2px 8px rgba(255, 107, 139, 0.4)' : 'none',
+                        transition: 'all 0.2s ease',
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
 
               {/* Custom Mascot GIF Upload / URL */}

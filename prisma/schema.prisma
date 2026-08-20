@@ -9,6 +9,7 @@ generator client {
 
 model User {
   id           String         @id @default(uuid())
+  name         String         @default("")
   username     String         @unique
   email        String         @unique
   passwordHash String
@@ -32,7 +33,7 @@ model Friendship {
   sender      User     @relation("SentFriendships", fields: [senderId], references: [id], onDelete: Cascade)
   receiverId  String
   receiver    User     @relation("ReceivedFriendships", fields: [receiverId], references: [id], onDelete: Cascade)
-  status      String   @default("PENDING") // PENDING, ACCEPTED, REJECTED
+  status      String   @default("PENDING")
   createdAt   DateTime @default(now())
 
   @@unique([senderId, receiverId])

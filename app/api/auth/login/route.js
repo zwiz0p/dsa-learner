@@ -10,9 +10,11 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Please enter username/email and password' }, { status: 400 });
     }
 
+    const cleanInput = usernameOrEmail.trim().toLowerCase();
+
     const user = await db.user.findFirst({
       where: {
-        OR: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
+        OR: [{ username: cleanInput }, { email: cleanInput }],
       },
     });
 
@@ -31,6 +33,7 @@ export async function POST(req) {
       message: 'Login successful',
       user: {
         id: user.id,
+        name: user.name,
         username: user.username,
         email: user.email,
         avatar: user.avatar,

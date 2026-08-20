@@ -13,6 +13,7 @@ export async function GET(req) {
       where: { id: auth.id },
       select: {
         id: true,
+        name: true,
         username: true,
         email: true,
         avatar: true,
