@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { BASE_TOPICS, MILESTONES } from '../lib/initialProblems';
 
 export default function DashboardPage() {
@@ -8,6 +9,8 @@ export default function DashboardPage() {
   const [loadingUser, setLoadingUser] = useState(true);
   const [theme, setTheme] = useState('day');
   const [activeTab, setActiveTab] = useState('problems');
+
+  const router = useRouter();
 
   // State data
   const [solvedState, setSolvedState] = useState({});
@@ -27,6 +30,7 @@ export default function DashboardPage() {
   // Modals
   const [showAddModal, setShowAddModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showMascotModal, setShowMascotModal] = useState(false);
   const [showFriendModal, setShowFriendModal] = useState(false);
   const [showRequestsModal, setShowRequestsModal] = useState(false);
 
@@ -40,10 +44,31 @@ export default function DashboardPage() {
   const [friendInput, setFriendInput] = useState('');
   const [friendMsg, setFriendMsg] = useState('');
 
-  // Profile customization form
-  const [profilePhotoUrl, setProfilePhotoUrl] = useState('');
-  const [mascotGifUrl, setMascotGifUrl] = useState('');
-  const [userStatusMsg, setUserStatusMsg] = useState('');
+  // Profile PFP state
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState('/avatars/default.png');
+  // Mascot GIF state
+  const [mascotGifUrl, setMascotGifUrl] = useState('/mascots/default.gif');
+
+  // Preset Mascot GIFs from public/mascots
+  const presetMascots = [
+    '/mascots/default.gif',
+    '/mascots/cat_paws.gif',
+    '/mascots/chika.gif',
+    '/mascots/lufy_punch.gif',
+    '/mascots/scuba_cat.gif',
+    '/mascots/yo.gif',
+  ];
+
+  // Preset PFPs from public/avatars
+  const presetAvatars = [
+    '/avatars/default.png',
+    '/avatars/annoyed.jpg',
+    '/avatars/avatar1.png',
+    '/avatars/avatar2.png',
+    '/avatars/avatar3.png',
+    '/avatars/avatar4.png',
+    '/avatars/avatar5.png',
+  ];
 
   // Chat state
   const [chatMessages, setChatMessages] = useState([]);
@@ -52,13 +77,10 @@ export default function DashboardPage() {
   // Pomodoro Timer state
   const [pomoTime, setPomoTime] = useState(25 * 60);
   const [pomoActive, setPomoActive] = useState(false);
-  const [pomoMode, setPomoMode] = useState('focus'); // 'focus' (25m) or 'break' (5m)
+  const [pomoMode, setPomoMode] = useState('focus');
 
-  // Floating Music Player state
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [musicSource, setMusicSource] = useState('youtube');
-  const [ytStreamId, setYtStreamId] = useState('jfKfPfyJRdk');
-  const [spotifyUrl, setSpotifyUrl] = useState('https://open.spotify.com/embed/playlist/0vvRV22zYsJyB3Z8fB9Wff');
+  // Music Player state (Functional Web Player for YouTube & Spotify)
+  const [musicSource, setMusicSource] = useState('youtube'); // 'youtube' or 'spotify'
   const [isPlayerExpanded, setIsPlayerExpanded] = useState(false);
 
   const canvasRef = useRef(null);
@@ -82,7 +104,6 @@ export default function DashboardPage() {
       fetchNotes();
       setProfilePhotoUrl(user.avatar || '/avatars/default.png');
       setMascotGifUrl(user.mascotGif || '/mascots/default.gif');
-      setUserStatusMsg(user.status || 'Online 🟢');
     }
   }, [user]);
 
@@ -261,14 +282,14 @@ export default function DashboardPage() {
     } catch (e) {}
   };
 
-  // Save profile settings
-  const handleSaveProfileSettings = async (e) => {
+  // Save PFP Profile settings
+  const handleSavePfpSettings = async (e) => {
     e.preventDefault();
     try {
       const res = await fetch('/api/user/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ avatar: profilePhotoUrl, mascotGif: mascotGifUrl, status: userStatusMsg }),
+        body: JSON.stringify({ avatar: profilePhotoUrl }),
       });
       const data = await res.json();
       if (data.user) setUser(data.user);
@@ -276,14 +297,37 @@ export default function DashboardPage() {
     } catch (e) {}
   };
 
-  // Handle File Upload (Convert to DataURL for instant local display & preview)
-  const handleFileUpload = (e, setter) => {
+  // Save Mascot GIF settings
+  const handleSaveMascotSettings = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('/api/user/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mascotGif: mascotGifUrl }),
+      });
+      const data = await res.json();
+      if (data.user) setUser(data.user);
+      setShowMascotModal(false);
+    } catch (e) {}
+  };
+
+  // Handle Mascot File Upload
+  const handleMascotFileUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => setter(reader.result);
+      reader.onloadend = () => setMascotGifUrl(reader.result);
       reader.readAsDataURL(file);
     }
+  };
+
+  // Handle Logout
+  const handleLogout = () => {
+    document.cookie = 'token=; path=/; max-age=0';
+    setUser(null);
+    setShowProfileModal(false);
+    router.push('/login');
   };
 
   // Send chat message
@@ -352,8 +396,15 @@ export default function DashboardPage() {
   });
 
   const overallPct = totalQ ? Math.round((totalSolved / totalQ) * 100) : 0;
-  const circumference = 314;
-  const strokeOffset = circumference - (circumference * overallPct / 100);
+  const strokeOffset = 314 - (314 * overallPct / 100);
+
+  // Auto-Detected User Status
+  const getAutoDetectedStatus = () => {
+    if (activeTab === 'study') return 'In Study Lounge ☕';
+    if (totalSolved === 0) return 'Solving DSA 📖';
+    if (totalSolved >= 5) return `In the Zone! ⚡ (${totalSolved} Solved Today)`;
+    return `On a Roll! 🔥 (${totalSolved} Solved Today)`;
+  };
 
   // Dynamic Mascot Encouragement Speech Bubble
   const getDynamicMascotSpeech = () => {
@@ -456,10 +507,11 @@ export default function DashboardPage() {
                   )}
                 </button>
 
+                {/* Profile Pill -> Opens User Profile & PFP Edit Modal */}
                 <div className="profile-pill" onClick={() => setShowProfileModal(true)}>
                   <img src={user.avatar || '/avatars/default.png'} alt="Avatar" style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} onError={(e) => { e.target.onerror = null; e.target.src = '/avatars/default.png'; }} />
-                  <span className="profile-name">{user.username}</span>
-                  <div className="status-dot" title="Online"></div>
+                  <span className="profile-name">{user.name || user.username}</span>
+                  <div className="status-dot" title={getAutoDetectedStatus()}></div>
                 </div>
               </>
             ) : (
@@ -532,7 +584,7 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <div style={{ fontSize: '12.5px', color: 'var(--text-dim)' }}>
-                      📌 Custom Shared Problems: <strong style={{ color: 'var(--accent-pink)' }}>{customProblems.length}</strong> &nbsp;|&nbsp; 
+                      📌 Status: <strong style={{ color: 'var(--accent-pink)' }}>{getAutoDetectedStatus()}</strong> &nbsp;|&nbsp; 
                       👥 Study Friends: <strong style={{ color: 'var(--accent-gold)' }}>{friends.length}</strong>
                     </div>
                   </div>
@@ -544,7 +596,8 @@ export default function DashboardPage() {
                       <img src={user.mascotGif || '/mascots/default.gif'} alt="Custom Mascot GIF" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.onerror = null; e.target.src = '/mascots/default.gif'; }} />
                     </div>
                     <div className="mascot-name">{user.username}'s Mascot 🌸</div>
-                    <button style={{ border: 'none', background: 'none', color: 'var(--accent-pink)', fontSize: '11px', fontWeight: 700, cursor: 'pointer', marginTop: '4px' }} onClick={() => setShowProfileModal(true)}>⚙️ Change GIF & Avatar</button>
+                    {/* Separate Mascot Customization Button */}
+                    <button style={{ border: 'none', background: 'none', color: 'var(--accent-pink)', fontSize: '11.5px', fontWeight: 700, cursor: 'pointer', marginTop: '6px' }} onClick={() => setShowMascotModal(true)}>⚙️ Customize Mascot GIF</button>
                   </div>
                 </div>
 
@@ -731,7 +784,7 @@ export default function DashboardPage() {
                 <p style={{ fontSize: '13px', color: 'var(--text-dim)', marginBottom: '16px' }}>Chat in real-time with your friends while solving DSA problems!</p>
 
                 {/* ANIME POMODORO TIMER WIDGET */}
-                <div style={{ background: 'linear-gradient(135deg, rgba(255,107,139,0.12), rgba(255,184,77,0.12))', border: '1px solid var(--glass-border)', borderRadius: '22px', padding: '16px 20px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContainer: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+                <div style={{ background: 'linear-gradient(135deg, rgba(255,107,139,0.12), rgba(255,184,77,0.12))', border: '1px solid var(--glass-border)', borderRadius: '22px', padding: '16px 20px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
                   <div>
                     <div style={{ fontFamily: 'Fredoka, sans-serif', fontSize: '16px', fontWeight: 700, color: 'var(--text-main)' }}>⏱️ Anime Pomodoro Timer ({pomoMode.toUpperCase()})</div>
                     <div style={{ fontSize: '12px', color: 'var(--text-dim)' }}>25 min Focus Session / 5 min Break</div>
@@ -817,60 +870,49 @@ export default function DashboardPage() {
 
       </div>
 
-      {/* FLOATING MUSIC PLAYER WINDOW (Visible only when logged in) */}
+      {/* FLOATING MUSIC PLAYER WINDOW (Interactive Functional YouTube & Spotify Web Login Player) */}
       {user && (
         <div className={`music-floating-player ${isPlayerExpanded ? 'expanded' : ''}`}>
           <div className="player-top-row">
-            <div className={`vinyl-disc ${isPlaying ? 'playing' : ''}`}>
+            <div className="vinyl-disc playing">
               <div className="vinyl-center-dot"></div>
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontFamily: 'Fredoka, sans-serif', fontSize: '13.5px', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Music Lounge — Spotify & YouTube</div>
-              <div style={{ fontSize: '11px', color: 'var(--text-dim)' }}>Connect to personal YouTube / Spotify</div>
+              <div style={{ fontFamily: 'Fredoka, sans-serif', fontSize: '13.5px', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Music Lounge — YouTube & Spotify</div>
+              <div style={{ fontSize: '11px', color: 'var(--text-dim)' }}>Functional web player & account login</div>
             </div>
-            <button className="btn-icon-play" onClick={() => setIsPlaying(!isPlaying)} title={isPlaying ? "Pause" : "Play"}>
-              {isPlaying ? '❚❚' : '▶'}
-            </button>
-            <button className="btn-icon-play" style={{ background: 'var(--badge-bg)', color: 'var(--text-main)', fontSize: '11px' }} onClick={() => setIsPlayerExpanded(!isPlayerExpanded)} title="Expand/Minimize Player">
-              {isPlayerExpanded ? '▼ Minimize' : '▲ Enlarge'}
+            <button className="btn-icon-play" style={{ background: 'var(--badge-bg)', color: 'var(--text-main)', fontSize: '11px', width: 'auto', padding: '0 10px' }} onClick={() => setIsPlayerExpanded(!isPlayerExpanded)} title="Expand/Minimize Player">
+              {isPlayerExpanded ? '▼ Minimize' : '▲ Enlarge Player'}
             </button>
           </div>
 
           {isPlayerExpanded && (
             <div className="player-expand-panel">
               <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
-                <button style={{ flex: 1, border: 'none', background: musicSource === 'youtube' ? 'var(--accent-pink)' : 'rgba(0,0,0,0.05)', color: musicSource === 'youtube' ? '#fff' : 'var(--text-dim)', padding: '6px', borderRadius: '12px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }} onClick={() => setMusicSource('youtube')}>📺 YouTube</button>
-                <button style={{ flex: 1, border: 'none', background: musicSource === 'spotify' ? 'var(--accent-pink)' : 'rgba(0,0,0,0.05)', color: musicSource === 'spotify' ? '#fff' : 'var(--text-dim)', padding: '6px', borderRadius: '12px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }} onClick={() => setMusicSource('spotify')}>🎵 Spotify</button>
+                <button style={{ flex: 1, border: 'none', background: musicSource === 'youtube' ? 'var(--accent-pink)' : 'rgba(0,0,0,0.05)', color: musicSource === 'youtube' ? '#fff' : 'var(--text-dim)', padding: '7px', borderRadius: '12px', fontSize: '11.5px', fontWeight: 700, cursor: 'pointer' }} onClick={() => setMusicSource('youtube')}>📺 YouTube</button>
+                <button style={{ flex: 1, border: 'none', background: musicSource === 'spotify' ? 'var(--accent-pink)' : 'rgba(0,0,0,0.05)', color: musicSource === 'spotify' ? '#fff' : 'var(--text-dim)', padding: '7px', borderRadius: '12px', fontSize: '11.5px', fontWeight: 700, cursor: 'pointer' }} onClick={() => setMusicSource('spotify')}>🎵 Spotify</button>
               </div>
 
-              {musicSource === 'youtube' ? (
-                <div>
-                  <select className="select-cute" style={{ fontSize: '11.5px', padding: '6px 10px', marginBottom: '8px' }} value={ytStreamId} onChange={(e) => setYtStreamId(e.target.value)}>
-                    <option value="jfKfPfyJRdk">🎧 Lofi Girl - Beats to Relax/Study</option>
-                    <option value="5qap5aO4i9A">🌸 Anime Lofi Chill Beats</option>
-                    <option value="MVPTG06GI8c">🌃 Japanese City Pop & Synth</option>
-                    <option value="7NOSDKb0HlU">☕ Chillhop Cafe Radio</option>
-                  </select>
-                </div>
-              ) : (
-                <div>
-                  <input type="text" className="input-cute" style={{ fontSize: '11.5px', padding: '6px 10px', marginBottom: '8px' }} value={spotifyUrl} onChange={(e) => setSpotifyUrl(e.target.value)} placeholder="Paste Spotify embed URL or track link..." />
-                </div>
-              )}
+              {/* Direct Web Frame for Login & Search */}
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                <a
+                  href={musicSource === 'youtube' ? 'https://www.youtube.com' : 'https://open.spotify.com'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-cute-primary"
+                  style={{ flex: 1, fontSize: '11px', padding: '6px 10px', textAlign: 'center', justifyContent: 'center' }}
+                >
+                  🌐 Open & Log in to {musicSource === 'youtube' ? 'YouTube' : 'Spotify'}
+                </a>
+              </div>
 
-              {isPlaying ? (
-                <div style={{ width: '100%', height: '180px', borderRadius: '16px', overflow: 'hidden' }}>
-                  <iframe
-                    src={musicSource === 'youtube' ? `https://www.youtube.com/embed/${ytStreamId}?autoplay=1&mute=0` : spotifyUrl}
-                    style={{ width: '100%', height: '100%', border: 0 }}
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                  />
-                </div>
-              ) : (
-                <div style={{ textAlign: 'center', padding: '20px', background: 'rgba(0,0,0,0.03)', borderRadius: '16px', fontSize: '12px', color: 'var(--text-dim)' }}>
-                  Click <strong>▶ Play</strong> to launch mini web player frame & sign in!
-                </div>
-              )}
+              <div style={{ width: '100%', height: '220px', borderRadius: '16px', overflow: 'hidden', border: '1px solid var(--glass-border)' }}>
+                <iframe
+                  src={musicSource === 'youtube' ? 'https://www.youtube.com/embed?listType=search&list=lofi+beats' : 'https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M'}
+                  style={{ width: '100%', height: '100%', border: 0 }}
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                />
+              </div>
             </div>
           )}
         </div>
@@ -996,21 +1038,27 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* MODAL: PROFILE & GIF MASCOT CUSTOMIZATION */}
+      {/* MODAL: USER PROFILE & PFP EDIT MODAL (With Logout Button) */}
       {showProfileModal && (
         <div className="modal-overlay">
           <div className="modal-box-cute">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-              <span style={{ fontFamily: 'Fredoka, sans-serif', fontSize: '18px', fontWeight: 700 }}>⚙️ Customize Profile & Mascot</span>
+              <span style={{ fontFamily: 'Fredoka, sans-serif', fontSize: '18px', fontWeight: 700 }}>👤 User Profile</span>
               <button style={{ border: 'none', background: 'transparent', fontSize: '18px', cursor: 'pointer' }} onClick={() => setShowProfileModal(false)}>✕</button>
             </div>
 
-            <form onSubmit={handleSaveProfileSettings}>
-              {/* Preset Profile Photo Selection (No Upload for PFPs) */}
+            <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+              <img src={user.avatar || '/avatars/default.png'} alt="PFP" style={{ width: '72px', height: '72px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--accent-pink)', marginBottom: '8px' }} />
+              <div style={{ fontFamily: 'Fredoka, sans-serif', fontSize: '20px', fontWeight: 700, color: 'var(--text-main)' }}>{user.name || user.username}</div>
+              <div style={{ fontSize: '12px', color: 'var(--text-dim)' }}>@{user.username} · {user.email}</div>
+            </div>
+
+            <form onSubmit={handleSavePfpSettings}>
+              {/* Preset Profile Photo Selection (PFPs) */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '6px' }}>Select Profile Photo (PFP)</label>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                  {['/avatars/default.png', '/avatars/annoyed.jpg', '/avatars/avatar1.png', '/avatars/avatar2.png', '/avatars/avatar3.png', '/avatars/avatar4.png', '/avatars/avatar5.png'].map((imgUrl) => (
+                <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '6px' }}>Change Profile Photo (PFP)</label>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center' }}>
+                  {presetAvatars.map((imgUrl) => (
                     <img
                       key={imgUrl}
                       src={imgUrl}
@@ -1018,7 +1066,7 @@ export default function DashboardPage() {
                       onClick={() => setProfilePhotoUrl(imgUrl)}
                       onError={(e) => { e.target.style.display = 'none'; }}
                       style={{
-                        width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', cursor: 'pointer',
+                        width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover', cursor: 'pointer',
                         border: profilePhotoUrl === imgUrl ? '3px solid var(--accent-pink)' : '2px solid var(--glass-border)',
                         boxShadow: profilePhotoUrl === imgUrl ? '0 2px 8px rgba(255, 107, 139, 0.4)' : 'none',
                         transition: 'all 0.2s ease',
@@ -1028,20 +1076,53 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Custom Mascot GIF Upload / URL */}
-              <div style={{ marginBottom: '14px' }}>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '4px' }}>Mascot GIF URL / Upload GIF</label>
-                <input type="text" className="input-cute" value={mascotGifUrl} onChange={(e) => setMascotGifUrl(e.target.value)} placeholder="/mascots/default.gif or GIF URL..." style={{ marginBottom: '6px' }} />
-                <input type="file" accept="image/gif,image/*" onChange={(e) => handleFileUpload(e, setMascotGifUrl)} style={{ fontSize: '11px' }} />
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button type="submit" className="btn-cute-primary" style={{ flex: 1, justifyContent: 'center' }}>Save PFP ✨</button>
+                <button type="button" className="nav-btn" style={{ background: 'rgba(224, 72, 104, 0.15)', color: 'var(--accent-pink-deep)', border: 'none' }} onClick={handleLogout}>🚪 Logout</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: SEPARATE MASCOT GIF CUSTOMIZATION MODAL */}
+      {showMascotModal && (
+        <div className="modal-overlay">
+          <div className="modal-box-cute">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+              <span style={{ fontFamily: 'Fredoka, sans-serif', fontSize: '18px', fontWeight: 700 }}>⚙️ Customize Mascot GIF</span>
+              <button style={{ border: 'none', background: 'transparent', fontSize: '18px', cursor: 'pointer' }} onClick={() => setShowMascotModal(false)}>✕</button>
+            </div>
+
+            <form onSubmit={handleSaveMascotSettings}>
+              {/* Preset Mascot GIFs Selector Grid */}
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '6px' }}>Select Preset Mascot GIF</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+                  {presetMascots.map((gifUrl) => (
+                    <div
+                      key={gifUrl}
+                      onClick={() => setMascotGifUrl(gifUrl)}
+                      style={{
+                        border: mascotGifUrl === gifUrl ? '3px solid var(--accent-pink)' : '2px solid var(--glass-border)',
+                        borderRadius: '16px', overflow: 'hidden', height: '80px', cursor: 'pointer',
+                        boxShadow: mascotGifUrl === gifUrl ? '0 2px 8px rgba(255, 107, 139, 0.4)' : 'none',
+                        transition: 'all 0.2s ease',
+                      }}
+                    >
+                      <img src={gifUrl} alt="Mascot GIF" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.style.display = 'none'; }} />
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              {/* Activity Status Message */}
-              <div style={{ marginBottom: '18px' }}>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '4px' }}>Status Message</label>
-                <input type="text" className="input-cute" value={userStatusMsg} onChange={(e) => setUserStatusMsg(e.target.value)} placeholder="e.g. Coding Kadane's Algorithm 🚀" />
+              {/* Custom Mascot GIF File Upload */}
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '4px' }}>OR Upload Custom Mascot GIF / Image</label>
+                <input type="file" accept="image/gif,image/*" onChange={handleMascotFileUpload} style={{ fontSize: '11.5px', width: '100%' }} />
               </div>
 
-              <button type="submit" className="btn-cute-primary" style={{ width: '100%', justifyContent: 'center' }}>Save Settings ✨</button>
+              <button type="submit" className="btn-cute-primary" style={{ width: '100%', justifyContent: 'center' }}>Save Mascot GIF ✨</button>
             </form>
           </div>
         </div>
