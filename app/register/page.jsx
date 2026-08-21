@@ -18,16 +18,22 @@ export default function RegisterPage() {
 
   const router = useRouter();
 
-  // Preset avatar photos
-  const presetAvatars = [
+  const [presetAvatars, setPresetAvatars] = useState([
     '/avatars/default.png',
     '/avatars/annoyed.jpg',
-    '/avatars/avatar1.png',
-    '/avatars/avatar2.png',
-    '/avatars/avatar3.png',
-    '/avatars/avatar4.png',
-    '/avatars/avatar5.png',
-  ];
+  ]);
+
+  // Fetch dynamic avatars from public/avatars folder
+  useState(() => {
+    fetch('/api/avatars')
+      .then(res => res.json())
+      .then(data => {
+        if (data.avatars && data.avatars.length > 0) {
+          setPresetAvatars(data.avatars);
+        }
+      })
+      .catch(() => {});
+  });
 
   // Check username availability as user types
   const handleUsernameChange = async (val) => {

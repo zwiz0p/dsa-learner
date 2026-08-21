@@ -23,6 +23,10 @@ export default function DashboardPage() {
   const [openTopics, setOpenTopics] = useState({});
   const [expandedNotesKey, setExpandedNotesKey] = useState(null);
 
+  // Dynamic Mascots and Avatars from public folders
+  const [presetMascots, setPresetMascots] = useState(['/mascots/default.gif']);
+  const [presetAvatars, setPresetAvatars] = useState(['/avatars/default.png']);
+
   // Search & Filter
   const [searchQuery, setSearchQuery] = useState('');
   const [diffFilter, setDiffFilter] = useState('ALL');
@@ -44,31 +48,9 @@ export default function DashboardPage() {
   const [friendInput, setFriendInput] = useState('');
   const [friendMsg, setFriendMsg] = useState('');
 
-  // Profile PFP state
+  // Profile PFP & Mascot state
   const [profilePhotoUrl, setProfilePhotoUrl] = useState('/avatars/default.png');
-  // Mascot GIF state
   const [mascotGifUrl, setMascotGifUrl] = useState('/mascots/default.gif');
-
-  // Preset Mascot GIFs from public/mascots
-  const presetMascots = [
-    '/mascots/default.gif',
-    '/mascots/cat_paws.gif',
-    '/mascots/chika.gif',
-    '/mascots/lufy_punch.gif',
-    '/mascots/scuba_cat.gif',
-    '/mascots/yo.gif',
-  ];
-
-  // Preset PFPs from public/avatars
-  const presetAvatars = [
-    '/avatars/default.png',
-    '/avatars/annoyed.jpg',
-    '/avatars/avatar1.png',
-    '/avatars/avatar2.png',
-    '/avatars/avatar3.png',
-    '/avatars/avatar4.png',
-    '/avatars/avatar5.png',
-  ];
 
   // Chat state
   const [chatMessages, setChatMessages] = useState([]);
@@ -79,8 +61,11 @@ export default function DashboardPage() {
   const [pomoActive, setPomoActive] = useState(false);
   const [pomoMode, setPomoMode] = useState('focus');
 
-  // Music Player state (Functional Web Player for YouTube & Spotify)
+  // Mini Web Player state for YouTube & Spotify
   const [musicSource, setMusicSource] = useState('youtube'); // 'youtube' or 'spotify'
+  const [ytInput, setYtInput] = useState('jfKfPfyJRdk'); // Video ID or YouTube link
+  const [ytEmbedId, setYtEmbedId] = useState('jfKfPfyJRdk');
+  const [spotifyUrl, setSpotifyUrl] = useState('https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M');
   const [isPlayerExpanded, setIsPlayerExpanded] = useState(false);
 
   const canvasRef = useRef(null);
@@ -95,6 +80,7 @@ export default function DashboardPage() {
     fetchProgress();
     fetchCustomProblems();
     fetchChat();
+    fetchMascotsAndAvatars();
   }, []);
 
   useEffect(() => {
@@ -125,6 +111,18 @@ export default function DashboardPage() {
     setTheme(next);
     localStorage.setItem('dsa_theme', next);
     document.documentElement.setAttribute('data-theme', next);
+  };
+
+  const fetchMascotsAndAvatars = async () => {
+    try {
+      const resM = await fetch('/api/mascots');
+      const dataM = await resM.json();
+      if (dataM.mascots && dataM.mascots.length > 0) setPresetMascots(dataM.mascots);
+
+      const resA = await fetch('/api/avatars');
+      const dataA = await resA.json();
+      if (dataA.avatars && dataA.avatars.length > 0) setPresetAvatars(dataA.avatars);
+    } catch (e) {}
   };
 
   const fetchUser = async () => {
@@ -356,6 +354,29 @@ export default function DashboardPage() {
     } catch (e) {}
   };
 
+  // YouTube URL / ID parser
+  const handlePlayYouTubeVideo = (e) => {
+    e.preventDefault();
+    let val = ytInput.trim();
+    if (!val) return;
+
+    if (val.includes('v=')) {
+      val = val.split('v=')[1]?.split('&')[0];
+    } else if (val.includes('youtu.be/')) {
+      val = val.split('youtu.be/')[1]?.split('?')[0];
+    }
+    setYtEmbedId(val);
+  };
+
+  // Open Sign In Popup Windows
+  const openYouTubeLogin = () => {
+    window.open('https://accounts.google.com/ServiceLogin?service=youtube', 'YTLogin', 'width=520,height=640');
+  };
+
+  const openSpotifyLogin = () => {
+    window.open('https://accounts.spotify.com/en/login', 'SpotifyLogin', 'width=520,height=640');
+  };
+
   // Combine Base Topics with Custom Problems
   const getMergedTopics = () => {
     const map = new Map();
@@ -508,7 +529,7 @@ export default function DashboardPage() {
                 </button>
 
                 {/* Profile Pill -> Opens User Profile & PFP Edit Modal */}
-                <div className="profile-pill" onClick={() => setShowProfileModal(true)}>
+                <div className="profile-pill" onClick={() => { fetchMascotsAndAvatars(); setShowProfileModal(true); }}>
                   <img src={user.avatar || '/avatars/default.png'} alt="Avatar" style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} onError={(e) => { e.target.onerror = null; e.target.src = '/avatars/default.png'; }} />
                   <span className="profile-name">{user.name || user.username}</span>
                   <div className="status-dot" title={getAutoDetectedStatus()}></div>
@@ -597,7 +618,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="mascot-name">{user.username}'s Mascot 🌸</div>
                     {/* Separate Mascot Customization Button */}
-                    <button style={{ border: 'none', background: 'none', color: 'var(--accent-pink)', fontSize: '11.5px', fontWeight: 700, cursor: 'pointer', marginTop: '6px' }} onClick={() => setShowMascotModal(true)}>⚙️ Customize Mascot GIF</button>
+                    <button style={{ border: 'none', background: 'none', color: 'var(--accent-pink)', fontSize: '11.5px', fontWeight: 700, cursor: 'pointer', marginTop: '6px' }} onClick={() => { fetchMascotsAndAvatars(); setShowMascotModal(true); }}>⚙️ Customize Mascot GIF</button>
                   </div>
                 </div>
 
@@ -870,7 +891,7 @@ export default function DashboardPage() {
 
       </div>
 
-      {/* FLOATING MUSIC PLAYER WINDOW (Interactive Functional YouTube & Spotify Web Login Player) */}
+      {/* FLOATING MUSIC PLAYER WINDOW (Overhauled YouTube & Spotify Search & Login Player) */}
       {user && (
         <div className={`music-floating-player ${isPlayerExpanded ? 'expanded' : ''}`}>
           <div className="player-top-row">
@@ -888,27 +909,55 @@ export default function DashboardPage() {
 
           {isPlayerExpanded && (
             <div className="player-expand-panel">
+              {/* Tab Selector: YouTube vs Spotify */}
               <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
-                <button style={{ flex: 1, border: 'none', background: musicSource === 'youtube' ? 'var(--accent-pink)' : 'rgba(0,0,0,0.05)', color: musicSource === 'youtube' ? '#fff' : 'var(--text-dim)', padding: '7px', borderRadius: '12px', fontSize: '11.5px', fontWeight: 700, cursor: 'pointer' }} onClick={() => setMusicSource('youtube')}>📺 YouTube</button>
-                <button style={{ flex: 1, border: 'none', background: musicSource === 'spotify' ? 'var(--accent-pink)' : 'rgba(0,0,0,0.05)', color: musicSource === 'spotify' ? '#fff' : 'var(--text-dim)', padding: '7px', borderRadius: '12px', fontSize: '11.5px', fontWeight: 700, cursor: 'pointer' }} onClick={() => setMusicSource('spotify')}>🎵 Spotify</button>
+                <button style={{ flex: 1, border: 'none', background: musicSource === 'youtube' ? 'var(--accent-pink)' : 'rgba(0,0,0,0.05)', color: musicSource === 'youtube' ? '#fff' : 'var(--text-dim)', padding: '7px', borderRadius: '12px', fontSize: '11.5px', fontWeight: 700, cursor: 'pointer' }} onClick={() => setMusicSource('youtube')}>📺 Mini YouTube</button>
+                <button style={{ flex: 1, border: 'none', background: musicSource === 'spotify' ? 'var(--accent-pink)' : 'rgba(0,0,0,0.05)', color: musicSource === 'spotify' ? '#fff' : 'var(--text-dim)', padding: '7px', borderRadius: '12px', fontSize: '11.5px', fontWeight: 700, cursor: 'pointer' }} onClick={() => setMusicSource('spotify')}>🎵 Mini Spotify</button>
               </div>
 
-              {/* Direct Web Frame for Login & Search */}
-              <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-                <a
-                  href={musicSource === 'youtube' ? 'https://www.youtube.com' : 'https://open.spotify.com'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-cute-primary"
-                  style={{ flex: 1, fontSize: '11px', padding: '6px 10px', textAlign: 'center', justifyContent: 'center' }}
-                >
-                  🌐 Open & Log in to {musicSource === 'youtube' ? 'YouTube' : 'Spotify'}
-                </a>
+              {/* Login Popup Buttons */}
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+                {musicSource === 'youtube' ? (
+                  <button type="button" className="nav-btn" style={{ flex: 1, fontSize: '11px', padding: '6px 10px', background: 'var(--badge-bg)', color: 'var(--accent-pink-deep)' }} onClick={openYouTubeLogin}>
+                    🔑 Sign In to YouTube Account
+                  </button>
+                ) : (
+                  <button type="button" className="nav-btn" style={{ flex: 1, fontSize: '11px', padding: '6px 10px', background: 'var(--badge-bg)', color: 'var(--accent-sage)' }} onClick={openSpotifyLogin}>
+                    🔑 Sign In to Spotify Account
+                  </button>
+                )}
               </div>
 
-              <div style={{ width: '100%', height: '220px', borderRadius: '16px', overflow: 'hidden', border: '1px solid var(--glass-border)' }}>
+              {/* YouTube Search / Video ID Bar */}
+              {musicSource === 'youtube' ? (
+                <form onSubmit={handlePlayYouTubeVideo} style={{ display: 'flex', gap: '6px', marginBottom: '8px' }}>
+                  <input
+                    type="text"
+                    className="input-cute"
+                    style={{ fontSize: '11.5px', padding: '6px 10px', flex: 1 }}
+                    value={ytInput}
+                    onChange={(e) => setYtInput(e.target.value)}
+                    placeholder="Paste YouTube Link or Video ID (e.g., jfKfPfyJRdk)..."
+                  />
+                  <button type="submit" className="btn-cute-primary" style={{ fontSize: '11px', padding: '6px 10px' }}>Play ▶</button>
+                </form>
+              ) : (
+                <div style={{ marginBottom: '8px' }}>
+                  <input
+                    type="text"
+                    className="input-cute"
+                    style={{ fontSize: '11.5px', padding: '6px 10px' }}
+                    value={spotifyUrl}
+                    onChange={(e) => setSpotifyUrl(e.target.value)}
+                    placeholder="Paste Spotify Track or Playlist Embed Link..."
+                  />
+                </div>
+              )}
+
+              {/* Functional Mini Web Embed Frame */}
+              <div style={{ width: '100%', height: '220px', borderRadius: '16px', overflow: 'hidden', border: '1px solid var(--glass-border)', background: '#000' }}>
                 <iframe
-                  src={musicSource === 'youtube' ? 'https://www.youtube.com/embed?listType=search&list=lofi+beats' : 'https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M'}
+                  src={musicSource === 'youtube' ? `https://www.youtube.com/embed/${ytEmbedId}?autoplay=1` : spotifyUrl}
                   style={{ width: '100%', height: '100%', border: 0 }}
                   allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                 />
@@ -1095,10 +1144,10 @@ export default function DashboardPage() {
             </div>
 
             <form onSubmit={handleSaveMascotSettings}>
-              {/* Preset Mascot GIFs Selector Grid */}
+              {/* Preset Mascot GIFs Selector Grid (Dynamically Discovered from /public/mascots/) */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '6px' }}>Select Preset Mascot GIF</label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '6px' }}>Select Preset Mascot GIF ({presetMascots.length} Available)</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', maxHeight: '240px', overflowY: 'auto' }}>
                   {presetMascots.map((gifUrl) => (
                     <div
                       key={gifUrl}
